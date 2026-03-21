@@ -1,6 +1,7 @@
-using StarterAssets;
+using System;
 using UnityEngine;
 
+[RequireComponent(typeof(InputManager))]
 public class PangThirdPersonController : MonoBehaviour
 {
 	[Header("Player")]
@@ -69,62 +70,70 @@ public class PangThirdPersonController : MonoBehaviour
 	private float _targetRotation = 0.0f;
 	private float _rotationVelocity;
 	private float _verticalVelocity;
-	private float _terminalVelocity = 53.0f;
-
-	// timeout deltatime
-	private float _jumpTimeoutDelta;
-	private float _fallTimeoutDelta;
 
 	// animation IDs
 	private int _animIDSpeed;
 	private int _animIDGrounded;
-	private int _animIDJump;
 	private int _animIDFreeFall;
 	private int _animIDMotionSpeed;
 
 	private Animator _animator;
-	private CharacterController _controller;
-	private StarterAssetsInputs _input;
+	private InputManager inputManager;
 	private GameObject _mainCamera;
+	private bool isSprinting;
+	private Vector3 velocity;
 
 	private bool _hasAnimator;
 
 	private void Awake()
 	{
 		// get a reference to our main camera
-		if (_mainCamera == null)
-		{
-			_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
-		}
+		_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+
+		velocity = Vector3.zero;
 	}
 
 	private void Start()
 	{
 		_hasAnimator = TryGetComponent(out _animator);
-		_controller = GetComponent<CharacterController>();
-		_input = GetComponent<StarterAssetsInputs>();
-		
-		AssignAnimationIDs();
+		inputManager = GetComponent<InputManager>();
 
-		// reset our timeouts on start
-		_jumpTimeoutDelta = JumpTimeout;
-		_fallTimeoutDelta = FallTimeout;
+		isSprinting = false;
+		inputManager.OnSprintBegin += OnSprintBegin;
+		inputManager.OnSprintEnd += OnSprintEnd;
+
+		AssignAnimationIDs();
+	}
+
+	private void OnDestroy()
+	{
+		inputManager.OnSprintBegin -= OnSprintBegin;
+		inputManager.OnSprintEnd -= OnSprintEnd;
+
+	}
+
+	private void OnSprintBegin(object sender, EventArgs args)
+	{
+		isSprinting = true;
+	}
+	private void OnSprintEnd(object sender, EventArgs args)
+	{
+		isSprinting = false;
 	}
 
 	private void Update()
 	{
 		_hasAnimator = TryGetComponent(out _animator);
 
+		OnMove(inputManager.GetMoveVector());
 		JumpAndGravity();
 		GroundedCheck();
-		Move();
 	}
 
 	private void AssignAnimationIDs()
 	{
 		_animIDSpeed = Animator.StringToHash("Speed");
 		_animIDGrounded = Animator.StringToHash("Grounded");
-		_animIDJump = Animator.StringToHash("Jump");
 		_animIDFreeFall = Animator.StringToHash("FreeFall");
 		_animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
 	}
@@ -132,7 +141,7 @@ public class PangThirdPersonController : MonoBehaviour
 	private void GroundedCheck()
 	{
 		// set sphere position, with offset
-		Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
+		var spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
 			transform.position.z);
 		Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
 			QueryTriggerInteraction.Ignore);
@@ -144,22 +153,24 @@ public class PangThirdPersonController : MonoBehaviour
 		}
 	}
 
-	private void Move()
+	private void OnMove(Vector2 moveVector)
 	{
+		var inputX = moveVector.x;
 		// set target speed based on move speed, sprint speed and if sprint is pressed
-		float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+		float targetSpeed = isSprinting ? SprintSpeed : MoveSpeed;
 
 		// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
-		// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-		// if there is no input, set the target speed to 0
-		if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+		if (inputX == 0)
+		{
+			targetSpeed = 0.0f;
+		}
 
 		// a reference to the players current horizontal velocity
-		float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+		float currentHorizontalSpeed = new Vector3(velocity.x, 0.0f, velocity.z).magnitude;
 
 		float speedOffset = 0.1f;
-		float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+		float inputMagnitude = 1f;
 
 		// accelerate or decelerate to target speed
 		if (currentHorizontalSpeed < targetSpeed - speedOffset ||
@@ -179,17 +190,15 @@ public class PangThirdPersonController : MonoBehaviour
 		}
 
 		_animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-		if (_animationBlend < 0.01f) _animationBlend = 0f;
-
-		// normalise input direction
-		Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-
-		// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-		// if there is a move input rotate player when the player is moving
-		if (_input.move != Vector2.zero)
+		if (_animationBlend < 0.01f)
 		{
-			_targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-							  _mainCamera.transform.eulerAngles.y;
+			_animationBlend = 0f;
+		}
+
+		// if there is a move input rotate player when the player is moving
+		if (inputX != 0)
+		{
+			_targetRotation = Mathf.Atan2(inputX, 0) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
 			float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
 				RotationSmoothTime);
 
@@ -197,12 +206,11 @@ public class PangThirdPersonController : MonoBehaviour
 			transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 		}
 
-
-		Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+		var targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
 		// move the player
-		_controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-						 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+		velocity = targetDirection.normalized * _speed + new Vector3(0.0f, _verticalVelocity, 0.0f);
+		transform.position = transform.position + velocity * Time.deltaTime;
 
 		// update animator if using character
 		if (_hasAnimator)
@@ -214,80 +222,34 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void JumpAndGravity()
 	{
+		// update animator if using character
+		if (_hasAnimator)
+		{
+			_animator.SetBool(_animIDFreeFall, !Grounded);
+		}
+
 		if (Grounded)
 		{
-			// reset the fall timeout timer
-			_fallTimeoutDelta = FallTimeout;
-
-			// update animator if using character
-			if (_hasAnimator)
-			{
-				_animator.SetBool(_animIDJump, false);
-				_animator.SetBool(_animIDFreeFall, false);
-			}
-
+			_verticalVelocity = 0;
+		}
+		else
+		{
 			// stop our velocity dropping infinitely when grounded
 			if (_verticalVelocity < 0.0f)
 			{
 				_verticalVelocity = -2f;
 			}
 
-			// Jump
-			if (_input.jump && _jumpTimeoutDelta <= 0.0f)
-			{
-				// the square root of H * -2 * G = how much velocity needed to reach desired height
-				_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-
-				// update animator if using character
-				if (_hasAnimator)
-				{
-					_animator.SetBool(_animIDJump, true);
-				}
-			}
-
-			// jump timeout
-			if (_jumpTimeoutDelta >= 0.0f)
-			{
-				_jumpTimeoutDelta -= Time.deltaTime;
-			}
-		}
-		else
-		{
-			// reset the jump timeout timer
-			_jumpTimeoutDelta = JumpTimeout;
-
-			// fall timeout
-			if (_fallTimeoutDelta >= 0.0f)
-			{
-				_fallTimeoutDelta -= Time.deltaTime;
-			}
-			else
-			{
-				// update animator if using character
-				if (_hasAnimator)
-				{
-					_animator.SetBool(_animIDFreeFall, true);
-				}
-			}
-
-			// if we are not grounded, do not jump
-			_input.jump = false;
-		}
-
-		// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-		if (_verticalVelocity < _terminalVelocity)
-		{
 			_verticalVelocity += Gravity * Time.deltaTime;
 		}
 	}
 	
 	private void OnDrawGizmosSelected()
 	{
-		Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
-		Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
+		var transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
+		var transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
 
-		if (Grounded) Gizmos.color = transparentGreen;
-		else Gizmos.color = transparentRed;
+		Gizmos.color = Grounded ? transparentGreen : transparentRed;
 
 		// when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
 		Gizmos.DrawSphere(
@@ -300,22 +262,24 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		if (animationEvent.animatorClipInfo.weight > 0.5f)
 		{
-
 			if (AudioFootsteps != null)
+			{
 				AudioFootsteps.Play();
+			}
+			
 			if (AudioFoley != null)
+			{
 				AudioFoley.Play();
+			}
 		}
 	}
 
 	// Animation event
 	public void OnLand(AnimationEvent animationEvent)
 	{
-		if (animationEvent.animatorClipInfo.weight > 0.5f)
+		if (LandingAudio != null && animationEvent.animatorClipInfo.weight > 0.5f)
 		{
-			if (LandingAudio != null)
-				LandingAudio.Play();
-
+			LandingAudio.Play();
 		}
 	}
 }
