@@ -22,7 +22,7 @@ public class PangHook : MonoBehaviour
 
 	private Material mat;
 
-	private CapsuleCollider collider;
+	private CapsuleCollider capsuleCollider;
 
 
 	void Awake()
@@ -32,8 +32,8 @@ public class PangHook : MonoBehaviour
 
 		mat = line.material;
 		line.enabled = false;
-		
-		collider = GetComponent<CapsuleCollider>();
+
+		capsuleCollider = GetComponent<CapsuleCollider>();
 	}
 
 	void Update()
@@ -101,36 +101,24 @@ public class PangHook : MonoBehaviour
 
 		// Rotate collider to match direction
 		var newRotation = Quaternion.FromToRotation(Vector3.up, direction);
-		collider.transform.SetPositionAndRotation(newPosition, newRotation);
+		capsuleCollider.transform.SetPositionAndRotation(newPosition, newRotation);
 
 		// Capsule settings
-		collider.height = length;
-		collider.radius = hookRadius;
-		collider.direction = 1; // Y axis
+		capsuleCollider.height = length;
+		capsuleCollider.radius = hookRadius;
+		capsuleCollider.direction = 1; // Y axis
 	}
 
 	private void OnTriggerEnter(Collider other)
 	{
-		Debug.Log($"triggerenter {other.name}");
 		if (other.TryGetComponent(out PangBall ball))
 		{
 			Debug.Log($"ball hit {ball.name}");
 			OnBallHit?.Invoke(this, ball);
+			ball.DestroyBall();
 
 			Destroy(gameObject);
 		}
 
 	}
-	/*
-	private void OnTriggerEnter(Collision collision)
-	{
-		if (collision.gameObject.TryGetComponent(out PangBall ball))
-		{
-			Debug.Log($"ball hit {ball.name}");
-			OnBallHit?.Invoke(this, ball);
-
-			DestroyImmediate(gameObject);
-		}
-	}
-	*/
 }

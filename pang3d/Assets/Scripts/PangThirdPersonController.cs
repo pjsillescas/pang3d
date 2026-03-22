@@ -271,15 +271,18 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		if (animationEvent.animatorClipInfo.weight > 0.5f)
 		{
+			/*
 			if (AudioFootsteps != null)
 			{
 				AudioFootsteps.Play();
 			}
-			
+			*/
+			/*
 			if (AudioFoley != null)
 			{
 				AudioFoley.Play();
 			}
+			*/
 		}
 	}
 
