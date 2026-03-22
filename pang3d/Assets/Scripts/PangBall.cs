@@ -3,10 +3,14 @@ using UnityEngine;
 
 public class PangBall : MonoBehaviour
 {
+	public enum BallType { BALL1, BALL2, BALL3, BALL4 }
 	public enum BallDirection { LEFT, RIGHT }
+
 	public static event EventHandler<PangBall> OnBallSpawned;
 	public static event EventHandler<PangBall> OnBallDestroyed;
 
+	[SerializeField]
+	private BallType ballType;
 	[SerializeField]
 	private BallDirection InitialDirection = BallDirection.RIGHT;
 	[SerializeField]
@@ -23,7 +27,7 @@ public class PangBall : MonoBehaviour
 	private int direction = 1; // 1 = right, -1 = left
 	private float radius;
 
-	private Vector3 directionVector;
+	//private Vector3 directionVector;
 	private void UpdateRadius()
 	{
 		var collider = GetComponent<SphereCollider>();
@@ -31,6 +35,8 @@ public class PangBall : MonoBehaviour
 
 		Debug.Log($"ball {name}: {radius}");
 	}
+
+	public BallType GetBallType() => ballType;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
@@ -40,7 +46,7 @@ public class PangBall : MonoBehaviour
 
 		direction = InitialDirection == BallDirection.RIGHT ? 1 : -1;
 
-		directionVector = new Vector3(1, 1, 0).normalized;
+		//directionVector = new Vector3(1, 1, 0).normalized;
 
 		OnBallSpawned?.Invoke(this, this);
 	}
@@ -62,7 +68,7 @@ public class PangBall : MonoBehaviour
 		// Vertical movement
 		verticalVelocity -= gravity * Time.deltaTime;
 		pos.y += verticalVelocity * Time.deltaTime;
-
+		pos.z = 0f;
 		transform.position = pos;
 
 		//var displacement = speed * Time.deltaTime * directionVector;
@@ -79,15 +85,15 @@ public class PangBall : MonoBehaviour
 		{
 			verticalVelocity = bounceForce;
 			transform.position = new Vector3(transform.position.x, radius, transform.position.z);
-			directionVector = Vector3.up;
+			//directionVector = Vector3.up;
 		}
 		else
 		{
 			direction *= -1;
-			directionVector = Vector3.Reflect(directionVector, normal);
+			//directionVector = Vector3.Reflect(directionVector, normal);
 		}
 
-		directionVector = directionVector.normalized;
+		//directionVector = directionVector.normalized;
 
 	}
 
@@ -96,7 +102,12 @@ public class PangBall : MonoBehaviour
 		Debug.Log("ball destroyed");
 		OnBallDestroyed?.Invoke(this, this);
 
-		Destroy(gameObject);
+		if (TryGetComponent(out NextBallSpawner ballSpawner))
+		{
+			ballSpawner.SpawnNextBalls(this);
+		}
+
+		Destroy(gameObject, 0.01f);
 		;
 	}
 }

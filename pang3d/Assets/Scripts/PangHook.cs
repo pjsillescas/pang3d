@@ -74,6 +74,8 @@ public class PangHook : MonoBehaviour
 	{
 		isShooting = false;
 		line.enabled = false;
+
+		DestroyHook();
 	}
 
 	void UpdateLine()
@@ -117,8 +119,14 @@ public class PangHook : MonoBehaviour
 			OnBallHit?.Invoke(this, ball);
 			ball.DestroyBall();
 
-			Destroy(gameObject);
+			DestroyHook();
 		}
+	}
 
+	private void DestroyHook()
+	{
+		gameObject.SetActive(false);
+
+		Destroy(gameObject);
 	}
 }
