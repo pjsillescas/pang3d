@@ -87,7 +87,6 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void Awake()
 	{
-		// get a reference to our main camera
 		_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 
 		velocity = Vector3.zero;
