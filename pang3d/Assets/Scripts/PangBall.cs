@@ -11,13 +11,14 @@ public class PangBall : MonoBehaviour
 	[SerializeField]
 	private float speed = 8f;
 
+	[SerializeField]
+	private LayerMask HookLayer;
+
 	private float verticalVelocity;
 	private int direction = 1; // 1 = right, -1 = left
 	private float radius;
 
 	private Vector3 directionVector;
-
-
 	private void UpdateRadius()
 	{
 		var collider = GetComponent<SphereCollider>();
@@ -94,5 +95,11 @@ public class PangBall : MonoBehaviour
 
 		directionVector = directionVector.normalized;
 
+	}
+
+	public void DestroyBall()
+	{
+		Debug.Log("ball destroyed");
+		;
 	}
 }

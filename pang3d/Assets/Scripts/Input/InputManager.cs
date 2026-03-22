@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-	public event EventHandler OnJump;
+	public event EventHandler OnHook;
+	public event EventHandler OnShoot;
 	public event EventHandler OnSprintBegin;
 	public event EventHandler OnSprintEnd;
 
@@ -42,9 +43,14 @@ public class InputManager : MonoBehaviour
 			return;
 		}
 
-		if (input.Player.Jump.WasPressedThisFrame())
+		if (input.Player.Shoot.WasPressedThisFrame())
 		{
-			OnJump?.Invoke(this, EventArgs.Empty);
+			OnShoot?.Invoke(this, EventArgs.Empty);
+		}
+
+		if (input.Player.Hook.WasPressedThisFrame())
+		{
+			OnHook?.Invoke(this, EventArgs.Empty);
 		}
 
 		if (input.Player.Sprint.WasPressedThisFrame())

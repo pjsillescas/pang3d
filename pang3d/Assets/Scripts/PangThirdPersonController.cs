@@ -6,63 +6,58 @@ public class PangThirdPersonController : MonoBehaviour
 {
 	[Header("Player")]
 	[Tooltip("Move speed of the character in m/s")]
-	public float MoveSpeed = 2.0f;
+	[SerializeField]
+	private float MoveSpeed = 2.0f;
 
 	[Tooltip("Sprint speed of the character in m/s")]
-	public float SprintSpeed = 5.335f;
+	[SerializeField]
+	private float SprintSpeed = 5.335f;
 
 	[Tooltip("How fast the character turns to face movement direction")]
 	[Range(0.0f, 0.3f)]
-	public float RotationSmoothTime = 0.12f;
+	[SerializeField]
+	private float RotationSmoothTime = 0.12f;
 
 	[Tooltip("Acceleration and deceleration")]
-	public float SpeedChangeRate = 10.0f;
+	[SerializeField]
+	private float SpeedChangeRate = 10.0f;
 
-	public AudioSource AudioFootsteps;
-	public AudioSource LandingAudio;
-	public AudioSource AudioFoley;
-	public AudioClip LandingAudioClip;
-	public AudioClip[] FootstepAudioClips;
-	[Range(0, 1)] public float FootstepAudioVolume = 0.5f;
-
-	[Space(10)]
-	[Tooltip("The height the player can jump")]
-	public float JumpHeight = 1.2f;
-
+	[SerializeField]
+	private AudioSource AudioFootsteps;
+	[SerializeField]
+	private AudioSource LandingAudio;
+	[SerializeField]
+	private AudioSource AudioFoley;
+	[SerializeField]
+	private AudioClip LandingAudioClip;
+	[SerializeField]
+	private AudioClip[] FootstepAudioClips;
 	[Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
-	public float Gravity = -15.0f;
-
-	[Space(10)]
-	[Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
-	public float JumpTimeout = 0.50f;
-
-	[Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-	public float FallTimeout = 0.15f;
-
+	[SerializeField]
+	private float Gravity = -15.0f;
 	[Header("Player Grounded")]
 	[Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
-	public bool Grounded = true;
+	[SerializeField]
+	private bool Grounded = true;
 
 	[Tooltip("Useful for rough ground")]
-	public float GroundedOffset = -0.14f;
+	[SerializeField]
+	private float GroundedOffset = -0.14f;
 
 	[Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
-	public float GroundedRadius = 0.28f;
+	[SerializeField]
+	private float GroundedRadius = 0.28f;
 
 	[Tooltip("What layers the character uses as ground")]
-	public LayerMask GroundLayers;
+	[SerializeField]
+	private LayerMask GroundLayers;
+	[Tooltip("Hook Shooting Origin")]
+	[SerializeField]
+	private Transform HookOrigin;
 
-	[Tooltip("How far in degrees can you move the camera up")]
-	public float TopClamp = 70.0f;
-
-	[Tooltip("How far in degrees can you move the camera down")]
-	public float BottomClamp = -30.0f;
-
-	[Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
-	public float CameraAngleOverride = 0.0f;
-
-	[Tooltip("For locking the camera position on all axis")]
-	public bool LockCameraPosition = false;
+	[Tooltip("Hook Shooting Origin")]
+	[SerializeField]
+	private GameObject HookPrefab;
 
 	// player
 	private float _speed;
@@ -100,6 +95,8 @@ public class PangThirdPersonController : MonoBehaviour
 		isSprinting = false;
 		inputManager.OnSprintBegin += OnSprintBegin;
 		inputManager.OnSprintEnd += OnSprintEnd;
+		inputManager.OnHook += OnHook;
+		inputManager.OnShoot += OnShoot;
 
 		AssignAnimationIDs();
 	}
@@ -108,13 +105,28 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		inputManager.OnSprintBegin -= OnSprintBegin;
 		inputManager.OnSprintEnd -= OnSprintEnd;
+		inputManager.OnHook -= OnHook;
+		inputManager.OnShoot -= OnShoot;
 
+	}
+
+	private void OnHook(object sender, EventArgs args)
+	{
+		Debug.Log("hook");
+		var hook = Instantiate(HookPrefab, HookOrigin.transform).GetComponent<PangHook>();
+		hook.Shoot(HookOrigin);
+	}
+
+	private void OnShoot(object sender, EventArgs args)
+	{
+		Debug.Log("shoot");
 	}
 
 	private void OnSprintBegin(object sender, EventArgs args)
 	{
 		isSprinting = true;
 	}
+	
 	private void OnSprintEnd(object sender, EventArgs args)
 	{
 		isSprinting = false;
@@ -122,8 +134,6 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void Update()
 	{
-		_hasAnimator = TryGetComponent(out _animator);
-
 		OnMove(inputManager.GetMoveVector());
 		JumpAndGravity();
 		GroundedCheck();
@@ -257,7 +267,7 @@ public class PangThirdPersonController : MonoBehaviour
 	}
 	
 	// Animation event
-	public void OnFootstep(AnimationEvent animationEvent)
+	public void OnFootstepPang(AnimationEvent animationEvent)
 	{
 		if (animationEvent.animatorClipInfo.weight > 0.5f)
 		{
@@ -274,7 +284,7 @@ public class PangThirdPersonController : MonoBehaviour
 	}
 
 	// Animation event
-	public void OnLand(AnimationEvent animationEvent)
+	public void OnLandPang(AnimationEvent animationEvent)
 	{
 		if (LandingAudio != null && animationEvent.animatorClipInfo.weight > 0.5f)
 		{
