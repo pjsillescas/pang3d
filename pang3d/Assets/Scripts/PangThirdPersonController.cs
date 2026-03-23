@@ -13,6 +13,10 @@ public class PangThirdPersonController : MonoBehaviour
 	[SerializeField]
 	private float SprintSpeed = 5.335f;
 
+	[Tooltip("Climb speed of the character in m/s")]
+	[SerializeField]
+	private float ClimbSpeed = 2.0f;
+
 	[Tooltip("How fast the character turns to face movement direction")]
 	[Range(0.0f, 0.3f)]
 	[SerializeField]
@@ -83,6 +87,8 @@ public class PangThirdPersonController : MonoBehaviour
 	private int maxHooksToShoot;
 	private int currentHooksShot;
 
+	private bool isInStairs;
+
 	private void Awake()
 	{
 		_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
@@ -90,6 +96,19 @@ public class PangThirdPersonController : MonoBehaviour
 		velocity = Vector3.zero;
 		maxHooksToShoot = 1;
 		currentHooksShot = 0;
+		isInStairs = false;
+	}
+
+	public void ActivateStairs()
+	{
+		Debug.Log("stairs on");
+		isInStairs = true;
+	}
+
+	public void DeactivateStairs()
+	{
+		Debug.Log("stairs off");
+		isInStairs = false;
 	}
 
 	private void Start()
@@ -172,7 +191,7 @@ public class PangThirdPersonController : MonoBehaviour
 		var spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
 			transform.position.z);
 		Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
-			QueryTriggerInteraction.Ignore);
+			QueryTriggerInteraction.Ignore) || isInStairs;
 
 		// update animator if using character
 		if (_hasAnimator)
@@ -181,9 +200,45 @@ public class PangThirdPersonController : MonoBehaviour
 		}
 	}
 
+	private float UpdateSpeed(float targetSpeed, float inputMagnitude)
+	{
+		float speed;
+		// a reference to the players current horizontal velocity
+		float currentHorizontalSpeed = new Vector3(velocity.x, 0.0f, velocity.z).magnitude;
+
+		float speedOffset = 0.1f;
+
+		// accelerate or decelerate to target speed
+		if (currentHorizontalSpeed < targetSpeed - speedOffset ||
+			currentHorizontalSpeed > targetSpeed + speedOffset)
+		{
+			// creates curved result rather than a linear one giving a more organic speed change
+			// note T in Lerp is clamped, so we don't need to clamp our speed
+			speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
+				Time.deltaTime * SpeedChangeRate);
+
+			// round speed to 3 decimal places
+			speed = Mathf.Round(speed * 1000f) / 1000f;
+		}
+		else
+		{
+			speed = targetSpeed;
+		}
+
+		return speed;
+	}
+
+	private float UpdateClimbSpeed(float targetSpeed, float inputMagnitude)
+	{
+		return targetSpeed;
+	}
+
+	private float _climbSpeed = 0.0f;
+
 	private void OnMove(Vector2 moveVector)
 	{
 		var inputX = moveVector.x;
+		var inputY = moveVector.y;
 		// set target speed based on move speed, sprint speed and if sprint is pressed
 		float targetSpeed = isSprinting ? SprintSpeed : MoveSpeed;
 
@@ -193,29 +248,11 @@ public class PangThirdPersonController : MonoBehaviour
 		{
 			targetSpeed = 0.0f;
 		}
-
-		// a reference to the players current horizontal velocity
-		float currentHorizontalSpeed = new Vector3(velocity.x, 0.0f, velocity.z).magnitude;
-
-		float speedOffset = 0.1f;
+		
 		float inputMagnitude = 1f;
-
-		// accelerate or decelerate to target speed
-		if (currentHorizontalSpeed < targetSpeed - speedOffset ||
-			currentHorizontalSpeed > targetSpeed + speedOffset)
-		{
-			// creates curved result rather than a linear one giving a more organic speed change
-			// note T in Lerp is clamped, so we don't need to clamp our speed
-			_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-				Time.deltaTime * SpeedChangeRate);
-
-			// round speed to 3 decimal places
-			_speed = Mathf.Round(_speed * 1000f) / 1000f;
-		}
-		else
-		{
-			_speed = targetSpeed;
-		}
+		_speed = UpdateSpeed(targetSpeed, inputMagnitude);
+		var targetClimbSpeed = isInStairs ? ClimbSpeed * inputY : 0f;
+		_climbSpeed = UpdateClimbSpeed(targetClimbSpeed, inputMagnitude);
 
 		_animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 		if (_animationBlend < 0.01f)
@@ -237,8 +274,10 @@ public class PangThirdPersonController : MonoBehaviour
 		var targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
 		// move the player
-		velocity = targetDirection.normalized * _speed + new Vector3(0.0f, _verticalVelocity, 0.0f);
-		transform.position = transform.position + velocity * Time.deltaTime;
+		velocity = targetDirection.normalized * _speed + new Vector3(0.0f, _verticalVelocity + _climbSpeed, 0.0f);
+
+		transform.SetPositionAndRotation(transform.position + velocity * Time.deltaTime,
+			new Quaternion(0, transform.rotation.y, 0, transform.rotation.w));
 
 		// update animator if using character
 		if (_hasAnimator)
@@ -256,7 +295,7 @@ public class PangThirdPersonController : MonoBehaviour
 			_animator.SetBool(_animIDFreeFall, !Grounded);
 		}
 
-		if (Grounded)
+		if (Grounded || isInStairs)
 		{
 			_verticalVelocity = 0;
 		}
