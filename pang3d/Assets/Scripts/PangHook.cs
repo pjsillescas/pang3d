@@ -23,7 +23,7 @@ public class PangHook : MonoBehaviour
 	private Material mat;
 
 	private CapsuleCollider capsuleCollider;
-
+	private Action onHookDestroyed;
 
 	void Awake()
 	{
@@ -55,13 +55,14 @@ public class PangHook : MonoBehaviour
 		UpdateLine();
 	}
 
-	public void Shoot(Transform originTransform)
+	public void Shoot(Transform originTransform, Action onHookDestroyed)
 	{
 		if (isShooting)
 		{
 			return;
 		}
 
+		this.onHookDestroyed = onHookDestroyed;
 		origin = originTransform.position;
 
 		isShooting = true;
@@ -125,6 +126,8 @@ public class PangHook : MonoBehaviour
 
 	private void DestroyHook()
 	{
+		onHookDestroyed?.Invoke();
+
 		gameObject.SetActive(false);
 
 		Destroy(gameObject);

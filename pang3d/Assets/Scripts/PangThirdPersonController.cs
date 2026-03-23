@@ -80,11 +80,16 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private bool _hasAnimator;
 
+	private int maxHooksToShoot;
+	private int currentHooksShot;
+
 	private void Awake()
 	{
 		_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 
 		velocity = Vector3.zero;
+		maxHooksToShoot = 1;
+		currentHooksShot = 0;
 	}
 
 	private void Start()
@@ -101,6 +106,11 @@ public class PangThirdPersonController : MonoBehaviour
 		AssignAnimationIDs();
 	}
 
+	public void AddMaxHooks(int numHooks)
+	{
+		maxHooksToShoot += numHooks;
+	}
+
 	private void OnDestroy()
 	{
 		inputManager.OnSprintBegin -= OnSprintBegin;
@@ -112,9 +122,18 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void OnHook(object sender, EventArgs args)
 	{
-		Debug.Log("hook");
-		var hook = Instantiate(HookPrefab, HookOrigin.transform).GetComponent<PangHook>();
-		hook.Shoot(HookOrigin);
+		if (currentHooksShot < maxHooksToShoot)
+		{
+			currentHooksShot++;
+			Debug.Log("hook");
+			var hook = Instantiate(HookPrefab, HookOrigin.transform).GetComponent<PangHook>();
+			hook.Shoot(HookOrigin, OnHookDestroyed);
+		}
+	}
+
+	private void OnHookDestroyed()
+	{
+		currentHooksShot = Math.Clamp(currentHooksShot - 1, 0, maxHooksToShoot);
 	}
 
 	private void OnShoot(object sender, EventArgs args)
