@@ -145,7 +145,7 @@ public class PangThirdPersonController : MonoBehaviour
 		{
 			currentHooksShot++;
 			Debug.Log("hook");
-			var hook = Instantiate(HookPrefab, HookOrigin.transform).GetComponent<PangHook>();
+			var hook = Instantiate(HookPrefab).GetComponent<PangHook>();
 			hook.Shoot(HookOrigin, OnHookDestroyed);
 		}
 	}

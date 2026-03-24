@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4942632930803877200}
   - component: {fileID: 6507234995415167622}
   - component: {fileID: 1857955799582589592}
+  - component: {fileID: 5477823769547759130}
   m_Layer: 7
   m_Name: Ball2
   m_TagString: Untagged
@@ -132,9 +133,6 @@ MonoBehaviour:
   horizontalSpeed: 3
   gravity: 20
   bounceForce: 15
-  HookLayer:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!54 &6507234995415167622
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -177,3 +175,15 @@ MonoBehaviour:
   Ball2Prefab: {fileID: 5112342978501835597}
   Ball3Prefab: {fileID: 8827009311782660699, guid: 8896a6fbe09395748bff1a325640330b, type: 3}
   Ball4Prefab: {fileID: 168846878799532490, guid: 264af3d8265cee642a286f8f89882cff, type: 3}
+--- !u!114 &5477823769547759130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5112342978501835597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f7f7d61215368d40a205c40f785aaff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DestructibleBall

@@ -8,6 +8,7 @@ TagManager:
   - Wall
   - Ground
   - Stairs
+  - Surface
   layers:
   - Default
   - TransparentFX

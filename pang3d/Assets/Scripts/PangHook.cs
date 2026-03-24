@@ -1,11 +1,13 @@
 using System;
 using UnityEngine;
+using UnityEngine.Splines;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(CapsuleCollider))]
 public class PangHook : MonoBehaviour
 {
-	public event EventHandler<PangBall> OnBallHit;
+	//public event EventHandler<PangBall> OnBallHit;
 
 	[SerializeField]
 	private float speed = 15f;
@@ -51,7 +53,7 @@ public class PangHook : MonoBehaviour
 			currentLength = maxLength;
 			StopHook();
 		}
-		
+
 		UpdateLine();
 	}
 
@@ -96,6 +98,7 @@ public class PangHook : MonoBehaviour
 
 	void UpdateCollider(Vector3 start, Vector3 end)
 	{
+
 		Vector3 direction = end - start;
 		float length = direction.magnitude;
 
@@ -110,16 +113,36 @@ public class PangHook : MonoBehaviour
 		capsuleCollider.height = length;
 		capsuleCollider.radius = hookRadius;
 		capsuleCollider.direction = 1; // Y axis
+
+		//tipCollider.transform.SetPositionAndRotation(end, newRotation);
 	}
 
 	private void OnTriggerEnter(Collider other)
 	{
+		/*
 		if (other.TryGetComponent(out PangBall ball))
 		{
 			Debug.Log($"ball hit {ball.name}");
 			OnBallHit?.Invoke(this, ball);
 			ball.DestroyBall();
 
+			DestroyHook();
+		}
+		else if (other.CompareTag("Surface"))
+		{
+			Debug.Log($"hook triggered with {other.gameObject.name}");
+			DestroyHook();
+		}
+		*/
+
+		if(other.TryGetComponent(out DestructibleObject destructibleObject))
+		{
+			destructibleObject.DestroyObject();
+			DestroyHook();
+		}
+		else if (other.CompareTag("Surface")) // Hard surfaces stop the hook
+		{
+			Debug.Log($"hook triggered with {other.gameObject.name}");
 			DestroyHook();
 		}
 	}
