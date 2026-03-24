@@ -20,9 +20,6 @@ public class PangBall : MonoBehaviour
 	[SerializeField]
 	private float bounceForce = 10f;
 
-	[SerializeField]
-	private LayerMask HookLayer;
-
 	private float verticalVelocity;
 	private int direction = 1; // 1 = right, -1 = left
 	private float radius;
@@ -81,10 +78,10 @@ public class PangBall : MonoBehaviour
 		Vector3 normal = contact.normal;
 
 		// Floor check
-		if (Vector3.Dot(normal, Vector3.up) > 0.7f)
+		if (Vector3.Dot(normal, Vector3.up) > 0.7f || collision.gameObject.CompareTag("Ground"))
 		{
 			verticalVelocity = bounceForce;
-			transform.position = new Vector3(transform.position.x, radius, transform.position.z);
+			transform.position = new Vector3(transform.position.x, transform.position.y + radius, transform.position.z);
 			//directionVector = Vector3.up;
 		}
 		else
@@ -92,14 +89,10 @@ public class PangBall : MonoBehaviour
 			direction *= -1;
 			//directionVector = Vector3.Reflect(directionVector, normal);
 		}
-
-		//directionVector = directionVector.normalized;
-
 	}
 
 	public void DestroyBall()
 	{
-		Debug.Log("ball destroyed");
 		OnBallDestroyed?.Invoke(this, this);
 
 		if (TryGetComponent(out NextBallSpawner ballSpawner))
@@ -108,6 +101,5 @@ public class PangBall : MonoBehaviour
 		}
 
 		Destroy(gameObject, 0.01f);
-		;
 	}
 }
