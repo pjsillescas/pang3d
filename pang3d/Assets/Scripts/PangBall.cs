@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(SphereCollider))]
 public class PangBall : MonoBehaviour
 {
 	public enum BallType { BALL1, BALL2, BALL3, BALL4 }
@@ -23,6 +24,29 @@ public class PangBall : MonoBehaviour
 	private float verticalVelocity;
 	private int direction = 1; // 1 = right, -1 = left
 	private float radius;
+	private bool isGamePaused;
+
+	private void OnEnable()
+	{
+		GameManager.OnPause += OnPause;
+		GameManager.OnUnpause += OnUnpause;
+	}
+
+	private void OnDisable()
+	{
+		GameManager.OnPause -= OnPause;
+		GameManager.OnUnpause -= OnUnpause;
+	}
+
+	private void OnPause(object sender, EventArgs args)
+	{
+		isGamePaused = true;
+	}
+
+	private void OnUnpause(object sender, EventArgs args)
+	{
+		isGamePaused = false;
+	}
 
 	//private Vector3 directionVector;
 	private void UpdateRadius()
@@ -38,6 +62,7 @@ public class PangBall : MonoBehaviour
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
+		isGamePaused = false;
 		UpdateRadius();
 		verticalVelocity = 0;
 
@@ -57,6 +82,11 @@ public class PangBall : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (isGamePaused)
+		{
+			return;
+		}
+
 		Vector3 pos = transform.position;
 
 		// Horizontal movement
@@ -74,6 +104,11 @@ public class PangBall : MonoBehaviour
 
 	void OnCollisionEnter(Collision collision)
 	{
+		if (isGamePaused)
+		{
+			return;
+		}
+
 		ContactPoint contact = collision.contacts[0];
 		Vector3 normal = contact.normal;
 

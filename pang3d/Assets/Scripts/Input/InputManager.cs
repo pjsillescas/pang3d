@@ -1,5 +1,4 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
@@ -11,11 +10,17 @@ public class InputManager : MonoBehaviour
 
 	private InputActions input;
 	private bool isEnabled;
+	private GameManager gameManager;
 
 	void Awake()
 	{
 		input = new InputActions();
 		isEnabled = false;
+	}
+
+	private void Start()
+	{
+		gameManager = FindAnyObjectByType<GameManager>();
 	}
 
 	private void OnEnable()
@@ -61,6 +66,11 @@ public class InputManager : MonoBehaviour
 		if (input.Player.Sprint.WasReleasedThisFrame())
 		{
 			OnSprintEnd?.Invoke(this, EventArgs.Empty);
+		}
+
+		if (input.Player.Pause.WasReleasedThisFrame())
+		{
+			gameManager.TogglePause();
 		}
 
 	}

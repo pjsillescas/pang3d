@@ -1,14 +1,10 @@
 using System;
 using UnityEngine;
-using UnityEngine.Splines;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(CapsuleCollider))]
 public class PangHook : MonoBehaviour
 {
-	//public event EventHandler<PangBall> OnBallHit;
-
 	[SerializeField]
 	private float speed = 15f;
 	[SerializeField]
@@ -26,6 +22,7 @@ public class PangHook : MonoBehaviour
 
 	private CapsuleCollider capsuleCollider;
 	private Action onHookDestroyed;
+	private bool isGamePaused;
 
 	void Awake()
 	{
@@ -36,11 +33,36 @@ public class PangHook : MonoBehaviour
 		line.enabled = false;
 
 		capsuleCollider = GetComponent<CapsuleCollider>();
+		isGamePaused = false;
 	}
+
+	private void Start()
+	{
+		GameManager.OnPause += OnPause;
+		GameManager.OnUnpause += OnUnpause;
+
+	}
+
+	private void OnDestroy()
+	{
+		GameManager.OnPause -= OnPause;
+		GameManager.OnUnpause -= OnUnpause;
+	}
+
+	private void OnPause(object sender, EventArgs args)
+	{
+		isGamePaused = true;
+	}
+
+	private void OnUnpause(object sender, EventArgs args)
+	{
+		isGamePaused = false;
+	}
+
 
 	void Update()
 	{
-		if (!isShooting)
+		if (!isShooting || isGamePaused)
 		{
 			return;
 		}
@@ -59,7 +81,7 @@ public class PangHook : MonoBehaviour
 
 	public void Shoot(Transform originTransform, Action onHookDestroyed)
 	{
-		if (isShooting)
+		if (isShooting || isGamePaused)
 		{
 			return;
 		}
@@ -73,7 +95,7 @@ public class PangHook : MonoBehaviour
 		line.enabled = true;
 	}
 
-	void StopHook()
+	private void StopHook()
 	{
 		isShooting = false;
 		line.enabled = false;
@@ -81,7 +103,7 @@ public class PangHook : MonoBehaviour
 		DestroyHook();
 	}
 
-	void UpdateLine()
+	private void UpdateLine()
 	{
 		Vector3 start = origin;
 		Vector3 end = start + Vector3.up * currentLength;
@@ -96,7 +118,7 @@ public class PangHook : MonoBehaviour
 		UpdateCollider(start, end);
 	}
 
-	void UpdateCollider(Vector3 start, Vector3 end)
+	private void UpdateCollider(Vector3 start, Vector3 end)
 	{
 
 		Vector3 direction = end - start;
@@ -119,22 +141,6 @@ public class PangHook : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		/*
-		if (other.TryGetComponent(out PangBall ball))
-		{
-			Debug.Log($"ball hit {ball.name}");
-			OnBallHit?.Invoke(this, ball);
-			ball.DestroyBall();
-
-			DestroyHook();
-		}
-		else if (other.CompareTag("Surface"))
-		{
-			Debug.Log($"hook triggered with {other.gameObject.name}");
-			DestroyHook();
-		}
-		*/
-
 		if(other.TryGetComponent(out DestructibleObject destructibleObject))
 		{
 			destructibleObject.DestroyObject();

@@ -6,17 +6,38 @@ public class GameManager : MonoBehaviour
 {
 	public enum GameResult { WON, LOST };
 
-	private static event EventHandler OnGameStarted;
-	private static event EventHandler<GameResult> OnGameEnded;
-	
+	public static event EventHandler OnGameStarted;
+	public static event EventHandler<GameResult> OnGameEnded;
+	public static event EventHandler OnPause;
+	public static event EventHandler OnUnpause;
+
 	private List<PangBall> balls;
+	private bool isGamePaused;
 
 	private void Awake()
 	{
 		balls = new();
 		PangBall.OnBallSpawned += OnBallSpawned;
 		PangBall.OnBallDestroyed += OnBallDestroyed;
+
+		isGamePaused = false;
 	}
+
+	public void TogglePause()
+	{
+		isGamePaused = !isGamePaused;
+
+		if (isGamePaused)
+		{
+			OnPause?.Invoke(this, EventArgs.Empty);
+		}
+		else
+		{
+			OnUnpause?.Invoke(this, EventArgs.Empty);
+		}
+	}
+
+	public bool IsGamePaused() => isGamePaused;
 
 	private void OnBallSpawned(object sender, PangBall ball)
 	{
@@ -27,7 +48,7 @@ public class GameManager : MonoBehaviour
 	{
 		balls.Remove(ball);
 
-		if(balls.Count <= 0)
+		if (balls.Count <= 0)
 		{
 			OnGameEnded?.Invoke(this, GameResult.WON);
 			Debug.Log("you won!!");

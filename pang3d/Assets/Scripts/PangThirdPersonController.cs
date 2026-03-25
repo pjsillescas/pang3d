@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(InputManager))]
@@ -88,6 +89,7 @@ public class PangThirdPersonController : MonoBehaviour
 	private int currentHooksShot;
 
 	private bool isInStairs;
+	private bool isGamePaused;
 
 	private void Awake()
 	{
@@ -97,6 +99,7 @@ public class PangThirdPersonController : MonoBehaviour
 		maxHooksToShoot = 1;
 		currentHooksShot = 0;
 		isInStairs = false;
+		isGamePaused = false;
 	}
 
 	public void ActivateStairs()
@@ -123,6 +126,19 @@ public class PangThirdPersonController : MonoBehaviour
 		inputManager.OnShoot += OnShoot;
 
 		AssignAnimationIDs();
+
+		GameManager.OnPause += OnPause;
+		GameManager.OnUnpause += OnUnpause;
+	}
+
+	private void OnPause(object sender, EventArgs args)
+	{
+		isGamePaused = true;
+	}
+
+	private void OnUnpause(object sender, EventArgs args)
+	{
+		isGamePaused = false;
 	}
 
 	public void AddMaxHooks(int numHooks)
@@ -137,11 +153,13 @@ public class PangThirdPersonController : MonoBehaviour
 		inputManager.OnHook -= OnHook;
 		inputManager.OnShoot -= OnShoot;
 
+		GameManager.OnPause -= OnPause;
+		GameManager.OnUnpause -= OnUnpause;
 	}
 
 	private void OnHook(object sender, EventArgs args)
 	{
-		if (currentHooksShot < maxHooksToShoot)
+		if (currentHooksShot < maxHooksToShoot && !isGamePaused)
 		{
 			currentHooksShot++;
 			Debug.Log("hook");
@@ -172,6 +190,11 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void Update()
 	{
+		if(isGamePaused)
+		{
+			return;
+		}
+
 		OnMove(inputManager.GetMoveVector());
 		JumpAndGravity();
 		GroundedCheck();
