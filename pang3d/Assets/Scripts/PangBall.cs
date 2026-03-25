@@ -109,6 +109,12 @@ public class PangBall : MonoBehaviour
 			return;
 		}
 
+		if(collision.gameObject.TryGetComponent(out PangThirdPersonController controller))
+		{
+			controller.KillCharacter();
+			return;
+		}
+
 		ContactPoint contact = collision.contacts[0];
 		Vector3 normal = contact.normal;
 

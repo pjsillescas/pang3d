@@ -1,11 +1,16 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(InputManager))]
 public class PangThirdPersonController : MonoBehaviour
 {
+	public static event EventHandler<int> OnPlayerKilled;
+
 	[Header("Player")]
+	[Tooltip("Player Id")]
+	[SerializeField]
+	private int PlayerId = 1;
+	
 	[Tooltip("Move speed of the character in m/s")]
 	[SerializeField]
 	private float MoveSpeed = 2.0f;
@@ -374,5 +379,10 @@ public class PangThirdPersonController : MonoBehaviour
 		{
 			LandingAudio.Play();
 		}
+	}
+
+	public void KillCharacter()
+	{
+		OnPlayerKilled?.Invoke(this, PlayerId);
 	}
 }

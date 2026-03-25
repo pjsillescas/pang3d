@@ -23,6 +23,12 @@ public class GameManager : MonoBehaviour
 		isGamePaused = false;
 	}
 
+	private void OnDestroy()
+	{
+		PangBall.OnBallSpawned += OnBallSpawned;
+		PangBall.OnBallDestroyed += OnBallDestroyed;
+	}
+
 	public void TogglePause()
 	{
 		isGamePaused = !isGamePaused;
