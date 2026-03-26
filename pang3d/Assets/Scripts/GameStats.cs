@@ -11,8 +11,8 @@ public class GameStats : MonoBehaviour
 
 	private void Awake()
 	{
-		player1Data = new PlayerDataDTO();
-		player2Data = new PlayerDataDTO();
+		player1Data = new PlayerDataDTO(1);
+		player2Data = new PlayerDataDTO(2);
 		
 		DontDestroyOnLoad(this);
 	}
@@ -34,7 +34,7 @@ public class GameStats : MonoBehaviour
 	{
 		PlayerDataDTO playerData = (playerId == 1) ? player1Data : player2Data;
 		playerData.AddLives(-1);
-		OnPlayerDataChanged?.Invoke(this, player1Data);
+		OnPlayerDataChanged?.Invoke(this, playerData);
 	}
 
 	private void OnBallDestroyed(object sender, PangBall ball)

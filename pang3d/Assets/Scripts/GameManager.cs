@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
 
 	private List<PangBall> balls;
 	private bool isGamePaused;
+	private TimeWidget timeWidget;
+	private LevelInfoWidget levelInfoWidget;
 
 	private void Awake()
 	{
@@ -25,8 +27,22 @@ public class GameManager : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		PangBall.OnBallSpawned += OnBallSpawned;
-		PangBall.OnBallDestroyed += OnBallDestroyed;
+		PangBall.OnBallSpawned -= OnBallSpawned;
+		PangBall.OnBallDestroyed -= OnBallDestroyed;
+		
+		if (timeWidget != null)
+		{
+			timeWidget.OnTimeout -= OnTimeout;
+		}
+
+		GameStats.OnPlayerDataChanged -= OnPlayerDataChanged;
+		OnGameEnded -= OnGameEndedMethod;
+	}
+
+	private void OnGameEndedMethod(object sender, GameResult result)
+	{
+		var resultString = result == GameResult.WON ? "you won!!" : "you lost";
+		Debug.Log($"Game finished: {resultString}");
 	}
 
 	public void TogglePause()
@@ -57,7 +73,6 @@ public class GameManager : MonoBehaviour
 		if (balls.Count <= 0)
 		{
 			OnGameEnded?.Invoke(this, GameResult.WON);
-			Debug.Log("you won!!");
 		}
 	}
 
@@ -65,6 +80,27 @@ public class GameManager : MonoBehaviour
 	void Start()
 	{
 		OnGameStarted?.Invoke(this, EventArgs.Empty);
+		timeWidget = FindAnyObjectByType<TimeWidget>();
+
+		levelInfoWidget = FindAnyObjectByType<LevelInfoWidget>();
+		timeWidget.StartTimer(levelInfoWidget.GetLevelData().Time);
+		timeWidget.OnTimeout += OnTimeout;
+		GameStats.OnPlayerDataChanged += OnPlayerDataChanged;
+		OnGameEnded += OnGameEndedMethod;
+	}
+
+	private void OnPlayerDataChanged(object sender, PlayerDataDTO playerData)
+	{
+		if(playerData.GetLives() <= 0)
+		{
+			OnGameEnded?.Invoke(this, GameResult.LOST);
+		}
+	}
+
+	private void OnTimeout(object sender, EventArgs args)
+	{
+		Debug.Log("time out");
+		OnGameEnded?.Invoke(this, GameResult.LOST);
 	}
 
 	// Update is called once per frame

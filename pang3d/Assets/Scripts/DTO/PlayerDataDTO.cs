@@ -2,11 +2,15 @@ public class PlayerDataDTO
 {
 	public const int LIVES_DEFAULT = 3;
 
+	private readonly int playerId;
+	
 	private int lives;
 	private int score;
 
-	public PlayerDataDTO()
+	public PlayerDataDTO(int playerId)
 	{
+		this.playerId = playerId;
+		
 		Reset();
 	}
 
@@ -15,6 +19,8 @@ public class PlayerDataDTO
 		lives = LIVES_DEFAULT;
 		score = 0;
 	}
+
+	public int GetPlayerId() => playerId;
 
 	public PlayerDataDTO SetLives(int lives)
 	{

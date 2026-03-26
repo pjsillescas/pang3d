@@ -95,6 +95,9 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private bool isInStairs;
 	private bool isGamePaused;
+	private float _climbSpeed;
+
+
 
 	private void Awake()
 	{
@@ -105,6 +108,7 @@ public class PangThirdPersonController : MonoBehaviour
 		currentHooksShot = 0;
 		isInStairs = false;
 		isGamePaused = false;
+		_climbSpeed = 0.0f;
 	}
 
 	public void ActivateStairs()
@@ -260,8 +264,6 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		return targetSpeed;
 	}
-
-	private float _climbSpeed = 0.0f;
 
 	private void OnMove(Vector2 moveVector)
 	{

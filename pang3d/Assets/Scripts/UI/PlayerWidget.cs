@@ -1,8 +1,10 @@
 using TMPro;
 using UnityEngine;
 
-public class ScoreWidget : MonoBehaviour
+public class PlayerWidget : MonoBehaviour
 {
+	[SerializeField]
+	private int PlayerId;
 	[SerializeField]
 	private TextMeshProUGUI ScoreText;
 	[SerializeField]
@@ -20,6 +22,10 @@ public class ScoreWidget : MonoBehaviour
 
 	private void OnPlayerDataChanged(object sender, PlayerDataDTO playerData)
 	{
-		ScoreText.text = playerData.GetScore().ToString();
+		if (playerData.GetPlayerId() == PlayerId)
+		{
+			ScoreText.text = playerData.GetScore().ToString();
+			LivesText.text = playerData.GetLives().ToString();
+		}
 	}
 }
