@@ -4,7 +4,13 @@ using UnityEngine;
 [RequireComponent(typeof(InputManager))]
 public class PangThirdPersonController : MonoBehaviour
 {
+	public struct ScoreStruct {
+		public int playerId;
+		public int score;
+	}
+	public static event EventHandler<ScoreStruct> OnScoreAdded;
 	public static event EventHandler<int> OnPlayerKilled;
+	public static event EventHandler<int> OnPlayerNewLife;
 
 	[Header("Player")]
 	[Tooltip("Player Id")]
@@ -97,7 +103,7 @@ public class PangThirdPersonController : MonoBehaviour
 	private bool isGamePaused;
 	private float _climbSpeed;
 
-
+	private bool isShieldEnabled;
 
 	private void Awake()
 	{
@@ -109,6 +115,17 @@ public class PangThirdPersonController : MonoBehaviour
 		isInStairs = false;
 		isGamePaused = false;
 		_climbSpeed = 0.0f;
+		isShieldEnabled = false;
+	}
+
+	public void ActivateShield()
+	{
+		isShieldEnabled = true;
+	}
+
+	public void DeactivateShield()
+	{
+		isShieldEnabled = false;
 	}
 
 	public void ActivateStairs()
@@ -385,6 +402,24 @@ public class PangThirdPersonController : MonoBehaviour
 
 	public void KillCharacter()
 	{
-		OnPlayerKilled?.Invoke(this, PlayerId);
+		if (isShieldEnabled)
+		{
+			Debug.Log("using shield");
+			DeactivateShield();
+		}
+		else
+		{
+			OnPlayerKilled?.Invoke(this, PlayerId);
+		}
+	}
+
+	public void AddLife()
+	{
+		OnPlayerNewLife?.Invoke(this, PlayerId);
+	}
+
+	public void AddScore(int score)
+	{
+		OnScoreAdded?.Invoke(this, new ScoreStruct() { playerId = PlayerId, score = score });
 	}
 }

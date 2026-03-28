@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static PangThirdPersonController;
 
 public class GameStats : MonoBehaviour
 {
@@ -13,14 +14,22 @@ public class GameStats : MonoBehaviour
 	{
 		player1Data = new PlayerDataDTO(1);
 		player2Data = new PlayerDataDTO(2);
-		
+
 		DontDestroyOnLoad(this);
+	}
+
+	private void Start()
+	{
+		OnPlayerDataChanged?.Invoke(this, player1Data);
+		OnPlayerDataChanged?.Invoke(this, player2Data);
 	}
 
 	private void OnEnable()
 	{
 		PangBall.OnBallDestroyed += OnBallDestroyed;
 		PangThirdPersonController.OnPlayerKilled += OnPlayerKilled;
+		PangThirdPersonController.OnPlayerNewLife += OnPlayerNewLife;
+		PangThirdPersonController.OnScoreAdded += OnScoreAdded;
 
 	}
 
@@ -28,12 +37,32 @@ public class GameStats : MonoBehaviour
 	{
 		PangBall.OnBallDestroyed -= OnBallDestroyed;
 		PangThirdPersonController.OnPlayerKilled -= OnPlayerKilled;
+		PangThirdPersonController.OnPlayerNewLife -= OnPlayerNewLife;
+		PangThirdPersonController.OnScoreAdded -= OnScoreAdded;
+	}
+
+	private void OnScoreAdded(object sender, ScoreStruct scoreStruct)
+	{
+		var playerData = scoreStruct.playerId == 1 ? player1Data : player2Data;
+		playerData.AddScore(scoreStruct.score);
+		
+		OnPlayerDataChanged?.Invoke(this, playerData);
 	}
 
 	private void OnPlayerKilled(object sender, int playerId)
 	{
+		AddLives(playerId, -1);
+	}
+
+	private void OnPlayerNewLife(object sender, int playerId)
+	{
+		AddLives(playerId, 1);
+	}
+
+	private void AddLives(int playerId, int numLives)
+	{
 		PlayerDataDTO playerData = (playerId == 1) ? player1Data : player2Data;
-		playerData.AddLives(-1);
+		playerData.AddLives(numLives);
 		OnPlayerDataChanged?.Invoke(this, playerData);
 	}
 
