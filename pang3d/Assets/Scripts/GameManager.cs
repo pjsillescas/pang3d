@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -15,6 +17,8 @@ public class GameManager : MonoBehaviour
 	private bool isGamePaused;
 	private TimeWidget timeWidget;
 	private LevelInfoWidget levelInfoWidget;
+
+	public List<PangBall> GetBalls() => balls;
 
 	private void Awake()
 	{
@@ -64,6 +68,7 @@ public class GameManager : MonoBehaviour
 	private void OnBallSpawned(object sender, PangBall ball)
 	{
 		balls.Add(ball);
+		Debug.Log("ball spawned");
 	}
 
 	private void OnBallDestroyed(object sender, PangBall ball)
@@ -103,9 +108,67 @@ public class GameManager : MonoBehaviour
 		OnGameEnded?.Invoke(this, GameResult.LOST);
 	}
 
-	// Update is called once per frame
-	void Update()
+	private const float CLOCK_TIMEOUT_SECONDS = 10;
+
+	public void RunClockItemAction()
 	{
-		//Debug.Log(balls.Count);
+		balls.ForEach(ball => ball.Pause());
+
+		StartCoroutine(WaitClockTimeout());
+	}
+
+	private IEnumerator WaitClockTimeout()
+	{
+		yield return new WaitForSeconds(CLOCK_TIMEOUT_SECONDS);
+		
+		balls.ForEach(ball => ball.UnPause());
+	}
+
+	public void RunDynamiteItemAction()
+	{
+		StartCoroutine(DynamiteItemAction());
+		//controller.AddMaxHooks(1);
+	}
+
+	private IEnumerator DynamiteItemAction()
+	{
+		var waitForSeconds = new WaitForSeconds(0.1f);
+		bool allSmallBalls;
+		int maxIterations = 5;
+		do
+		{
+			var balls = this.balls.Where(ball => ball.GetBallType() != PangBall.BallType.BALL4).ToList();
+			balls.ForEach(ball => ball.DestroyBall());
+
+			allSmallBalls = balls.Count == 0;
+			Debug.Log($"numballs {balls.Count}");
+			maxIterations--;
+
+			yield return waitForSeconds;
+		}
+		while (!allSmallBalls && maxIterations > 0);
+		Debug.Log("finish dynamite");
+
+	}
+
+	private const float HOURGLASS_TIMEOUT_SECONDS = 10;
+
+	public void RunHourglassItemAction()
+	{
+		balls.ForEach(ball => ball.SetSlowMode());
+
+		StartCoroutine(WaitHourglassTimeout());
+	}
+
+	private IEnumerator WaitHourglassTimeout()
+	{
+		yield return new WaitForSeconds(HOURGLASS_TIMEOUT_SECONDS);
+
+		balls.ForEach(ball => ball.SetFastMode());
+	}
+
+	public void RunStarItemAction()
+	{
+		new List<PangBall>(balls).ForEach(ball => ball.DestroyBallCompletely());
 	}
 }

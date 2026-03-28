@@ -2,6 +2,7 @@ public class Star : Item
 {
 	protected override void PerformItemAction(PangThirdPersonController controller)
 	{
-		controller.AddMaxHooks(1);
+		FindAnyObjectByType<GameManager>().RunStarItemAction();
+		controller.AddScore(10000);
 	}
 }

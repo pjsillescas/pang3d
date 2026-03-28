@@ -15,16 +15,25 @@ public class PangBall : MonoBehaviour
 	[SerializeField]
 	private BallDirection InitialDirection = BallDirection.RIGHT;
 	[SerializeField]
-	private float horizontalSpeed = 3f;
+	private float horizontalSpeedFast = 3f;
 	[SerializeField]
-	private float gravity = 20f;
+	private float gravityFast = 20f;
 	[SerializeField]
-	private float bounceForce = 10f;
+	private float bounceForceFast = 10f;
+	[SerializeField]
+	private float horizontalSpeedSlow = 1f;
+	[SerializeField]
+	private float gravitySlow = 5f;
+	[SerializeField]
+	private float bounceForceSlow = 5f;
 
 	private float verticalVelocity;
 	private int direction = 1; // 1 = right, -1 = left
 	private float radius;
 	private bool isGamePaused;
+	private float gravity;
+	private float horizontalSpeed;
+	private float bounceForce;
 
 	private void OnEnable()
 	{
@@ -40,10 +49,22 @@ public class PangBall : MonoBehaviour
 
 	private void OnPause(object sender, EventArgs args)
 	{
+		Pause();
+	}
+
+
+	public void Pause()
+	{
 		isGamePaused = true;
 	}
 
 	private void OnUnpause(object sender, EventArgs args)
+	{
+		UnPause();
+	}
+
+
+	public void UnPause()
 	{
 		isGamePaused = false;
 	}
@@ -59,10 +80,25 @@ public class PangBall : MonoBehaviour
 
 	public BallType GetBallType() => ballType;
 
+	public void SetFastMode()
+	{
+		gravity = gravityFast;
+		horizontalSpeed = horizontalSpeedFast;
+		bounceForce = bounceForceFast;
+	}
+
+	public void SetSlowMode()
+	{
+		gravity = gravitySlow;
+		horizontalSpeed = horizontalSpeedSlow;
+		bounceForce = bounceForceSlow;
+	}
+
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
 		isGamePaused = false;
+		SetFastMode();
 		UpdateRadius();
 		verticalVelocity = 0;
 
@@ -132,15 +168,25 @@ public class PangBall : MonoBehaviour
 		}
 	}
 
-	public void DestroyBall()
+	private void DestroyBall(bool useSpawner)
 	{
 		OnBallDestroyed?.Invoke(this, this);
 
-		if (TryGetComponent(out NextBallSpawner ballSpawner))
+		if (useSpawner && TryGetComponent(out NextBallSpawner ballSpawner))
 		{
 			ballSpawner.SpawnNextBalls(this);
 		}
 
 		Destroy(gameObject, 0.01f);
+	}
+
+	public void DestroyBall()
+	{
+		DestroyBall(true);
+	}
+	
+	public void DestroyBallCompletely()
+	{
+		DestroyBall(false);
 	}
 }

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: PlaygroundLevel
   m_EditorClassIdentifier: Assembly-CSharp::LevelDataSO
   LevelName: Playground
-  Time: 10
+  Time: 300
