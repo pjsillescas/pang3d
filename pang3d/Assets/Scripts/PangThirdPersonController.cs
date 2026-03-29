@@ -149,7 +149,6 @@ public class PangThirdPersonController : MonoBehaviour
 		inputManager.OnSprintBegin += OnSprintBegin;
 		inputManager.OnSprintEnd += OnSprintEnd;
 		inputManager.OnHook += OnHook;
-		inputManager.OnShoot += OnShoot;
 
 		AssignAnimationIDs();
 
@@ -177,7 +176,6 @@ public class PangThirdPersonController : MonoBehaviour
 		inputManager.OnSprintBegin -= OnSprintBegin;
 		inputManager.OnSprintEnd -= OnSprintEnd;
 		inputManager.OnHook -= OnHook;
-		inputManager.OnShoot -= OnShoot;
 
 		GameManager.OnPause -= OnPause;
 		GameManager.OnUnpause -= OnUnpause;
@@ -197,11 +195,6 @@ public class PangThirdPersonController : MonoBehaviour
 	private void OnHookDestroyed()
 	{
 		currentHooksShot = Math.Clamp(currentHooksShot - 1, 0, maxHooksToShoot);
-	}
-
-	private void OnShoot(object sender, EventArgs args)
-	{
-		Debug.Log("shoot");
 	}
 
 	private void OnSprintBegin(object sender, EventArgs args)

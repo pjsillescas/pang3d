@@ -11,6 +11,8 @@ public class PangBall : MonoBehaviour
 	public static event EventHandler<PangBall> OnBallDestroyed;
 
 	[SerializeField]
+	private float ItemProbability = 0.7f;
+	[SerializeField]
 	private BallType ballType;
 	[SerializeField]
 	private BallDirection InitialDirection = BallDirection.RIGHT;
@@ -168,9 +170,21 @@ public class PangBall : MonoBehaviour
 		}
 	}
 
+	private void SpawnItem()
+	{
+		var itemSpawner = FindAnyObjectByType<ItemSpawner>();
+
+		if (itemSpawner != null)
+		{
+			itemSpawner.TrySpawnRandomItem(ItemProbability, transform.position);
+		}
+	}
+
 	private void DestroyBall(bool useSpawner)
 	{
 		OnBallDestroyed?.Invoke(this, this);
+
+		SpawnItem();
 
 		if (useSpawner && TryGetComponent(out NextBallSpawner ballSpawner))
 		{
