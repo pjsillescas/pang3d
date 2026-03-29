@@ -219,10 +219,10 @@ public class PangThirdPersonController : MonoBehaviour
 
 		float angle = 10f;
 		var missileLeft = Instantiate(MissilePrefab).GetComponent<Missile>();
-		missileLeft.Shoot(ShootOrigin.position + new Vector3(-0.1f, 0, 0), -angle);
+		missileLeft.Shoot(ShootOrigin.position + new Vector3(0.1f, 0, 0), -angle);
 
 		var missileRight = Instantiate(MissilePrefab).GetComponent<Missile>();
-		missileRight.Shoot(ShootOrigin.position + new Vector3(0.1f, 0, 0), angle);
+		missileRight.Shoot(ShootOrigin.position + new Vector3(-0.1f, 0, 0), angle);
 	}
 
 	private void OnHookDestroyed()
