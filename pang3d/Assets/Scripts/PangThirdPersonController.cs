@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static PangHook;
 
 [RequireComponent(typeof(InputManager))]
 public class PangThirdPersonController : MonoBehaviour
@@ -71,10 +72,17 @@ public class PangThirdPersonController : MonoBehaviour
 	[SerializeField]
 	private Transform HookOrigin;
 
-	[Tooltip("Hook Shooting Origin")]
+	[Tooltip("Hook Prefab")]
 	[SerializeField]
 	private GameObject HookPrefab;
 
+	[Tooltip("Missile Prefab")]
+	[SerializeField]
+	private GameObject MissilePrefab;
+	[Tooltip("Missile Shoot Origin")]
+	[SerializeField]
+	private Transform ShootOrigin;
+	
 	// player
 	private float _speed;
 	private float _animationBlend;
@@ -104,6 +112,7 @@ public class PangThirdPersonController : MonoBehaviour
 	private float _climbSpeed;
 
 	private bool isShieldEnabled;
+	private HookType hookType;
 
 	private void Awake()
 	{
@@ -116,6 +125,12 @@ public class PangThirdPersonController : MonoBehaviour
 		isGamePaused = false;
 		_climbSpeed = 0.0f;
 		isShieldEnabled = false;
+		hookType = HookType.HOOK;
+	}
+
+	public void SetHookType(HookType hookType)
+	{
+		this.hookType = hookType;
 	}
 
 	public void ActivateShield()
@@ -183,13 +198,31 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void OnHook(object sender, EventArgs args)
 	{
+		if (hookType == HookType.MACHINE_GUN)
+		{
+			Shoot();
+			return;
+		}
+
 		if (currentHooksShot < maxHooksToShoot && !isGamePaused)
 		{
 			currentHooksShot++;
 			Debug.Log("hook");
 			var hook = Instantiate(HookPrefab).GetComponent<PangHook>();
-			hook.Shoot(HookOrigin, OnHookDestroyed);
+			hook.Shoot(HookOrigin, hookType, OnHookDestroyed);
 		}
+	}
+
+	private void Shoot()
+	{
+		Debug.Log("Bang!");
+
+		float angle = 10f;
+		var missileLeft = Instantiate(MissilePrefab).GetComponent<Missile>();
+		missileLeft.Shoot(ShootOrigin.position + new Vector3(-0.1f, 0, 0), -angle);
+
+		var missileRight = Instantiate(MissilePrefab).GetComponent<Missile>();
+		missileRight.Shoot(ShootOrigin.position + new Vector3(0.1f, 0, 0), angle);
 	}
 
 	private void OnHookDestroyed()

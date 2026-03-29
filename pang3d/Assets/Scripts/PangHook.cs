@@ -1,10 +1,15 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(CapsuleCollider))]
 public class PangHook : MonoBehaviour
 {
+	private const float GRAPPLE_TIMEOUT = 10f;
+
+	public enum HookType { HOOK, GRAPPLE, MACHINE_GUN }
+
 	[SerializeField]
 	private float speed = 15f;
 	[SerializeField]
@@ -19,6 +24,7 @@ public class PangHook : MonoBehaviour
 	private bool isShooting = false;
 
 	private Material mat;
+	private HookType hookType;
 
 	private CapsuleCollider capsuleCollider;
 	private Action onHookDestroyed;
@@ -73,19 +79,27 @@ public class PangHook : MonoBehaviour
 		if (currentLength >= maxLength)
 		{
 			currentLength = maxLength;
-			StopHook();
+			if (hookType == HookType.HOOK)
+			{
+				StopHook();
+			}
+			else
+			{
+				StartCoroutine(StopHookGrapple());
+			}
 		}
 
 		UpdateLine();
 	}
 
-	public void Shoot(Transform originTransform, Action onHookDestroyed)
+	public void Shoot(Transform originTransform, HookType hookType, Action onHookDestroyed)
 	{
 		if (isShooting || isGamePaused)
 		{
 			return;
 		}
 
+		this.hookType = hookType;
 		this.onHookDestroyed = onHookDestroyed;
 		origin = originTransform.position;
 
@@ -149,8 +163,24 @@ public class PangHook : MonoBehaviour
 		else if (other.CompareTag("Surface")) // Hard surfaces stop the hook
 		{
 			Debug.Log($"hook triggered with {other.gameObject.name}");
-			DestroyHook();
+			//DestroyHook();
+			if (hookType == HookType.HOOK)
+			{
+				StopHook();
+			}
+			else
+			{
+				StartCoroutine(StopHookGrapple());
+			}
+
 		}
+	}
+
+	private IEnumerator StopHookGrapple()
+	{
+		yield return new WaitForSeconds(GRAPPLE_TIMEOUT);
+
+		DestroyHook();
 	}
 
 	private void DestroyHook()

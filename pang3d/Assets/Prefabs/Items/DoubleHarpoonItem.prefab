@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1346006339334644302}
   - component: {fileID: 4671404785863017172}
   - component: {fileID: 8246454248644309792}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DoubleHarpoonItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
