@@ -114,6 +114,8 @@ public class PangThirdPersonController : MonoBehaviour
 	private bool isShieldEnabled;
 	private HookType hookType;
 
+	public int GetPlayerId() => PlayerId;
+
 	private void Awake()
 	{
 		_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
@@ -209,7 +211,7 @@ public class PangThirdPersonController : MonoBehaviour
 			currentHooksShot++;
 			Debug.Log("hook");
 			var hook = Instantiate(HookPrefab).GetComponent<PangHook>();
-			hook.Shoot(HookOrigin, hookType, OnHookDestroyed);
+			hook.Shoot(HookOrigin, hookType, OnHookDestroyed, PlayerId);
 		}
 	}
 
@@ -219,10 +221,10 @@ public class PangThirdPersonController : MonoBehaviour
 
 		float angle = 10f;
 		var missileLeft = Instantiate(MissilePrefab).GetComponent<Missile>();
-		missileLeft.Shoot(ShootOrigin.position + new Vector3(0.1f, 0, 0), -angle);
+		missileLeft.Shoot(ShootOrigin.position + new Vector3(0.1f, 0, 0), -angle, PlayerId);
 
 		var missileRight = Instantiate(MissilePrefab).GetComponent<Missile>();
-		missileRight.Shoot(ShootOrigin.position + new Vector3(-0.1f, 0, 0), angle);
+		missileRight.Shoot(ShootOrigin.position + new Vector3(-0.1f, 0, 0), angle, PlayerId);
 	}
 
 	private void OnHookDestroyed()

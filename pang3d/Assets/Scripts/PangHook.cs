@@ -18,6 +18,7 @@ public class PangHook : MonoBehaviour
 	[SerializeField]
 	private float hookRadius = 0.1f;
 
+	private int playerId;
 	private Vector3 origin;
 	private LineRenderer line;
 	private float currentLength = 0f;
@@ -92,13 +93,14 @@ public class PangHook : MonoBehaviour
 		UpdateLine();
 	}
 
-	public void Shoot(Transform originTransform, HookType hookType, Action onHookDestroyed)
+	public void Shoot(Transform originTransform, HookType hookType, Action onHookDestroyed, int playerId)
 	{
 		if (isShooting || isGamePaused)
 		{
 			return;
 		}
 
+		this.playerId = playerId;
 		this.hookType = hookType;
 		this.onHookDestroyed = onHookDestroyed;
 		origin = originTransform.position;
@@ -157,7 +159,7 @@ public class PangHook : MonoBehaviour
 	{
 		if(other.TryGetComponent(out DestructibleObject destructibleObject))
 		{
-			destructibleObject.DestroyObject();
+			destructibleObject.DestroyObject(playerId);
 			DestroyHook();
 		}
 		else if (other.CompareTag("Surface")) // Hard surfaces stop the hook

@@ -124,13 +124,13 @@ public class GameManager : MonoBehaviour
 		balls.ForEach(ball => ball.UnPause());
 	}
 
-	public void RunDynamiteItemAction()
+	public void RunDynamiteItemAction(int playerId)
 	{
-		StartCoroutine(DynamiteItemAction());
+		StartCoroutine(DynamiteItemAction(playerId));
 		//controller.AddMaxHooks(1);
 	}
 
-	private IEnumerator DynamiteItemAction()
+	private IEnumerator DynamiteItemAction(int playerId)
 	{
 		var waitForSeconds = new WaitForSeconds(0.1f);
 		bool allSmallBalls;
@@ -138,7 +138,7 @@ public class GameManager : MonoBehaviour
 		do
 		{
 			var balls = this.balls.Where(ball => ball.GetBallType() != PangBall.BallType.BALL4).ToList();
-			balls.ForEach(ball => ball.DestroyBall());
+			balls.ForEach(ball => ball.DestroyBall(playerId));
 
 			allSmallBalls = balls.Count == 0;
 			Debug.Log($"numballs {balls.Count}");
@@ -167,8 +167,8 @@ public class GameManager : MonoBehaviour
 		balls.ForEach(ball => ball.SetFastMode());
 	}
 
-	public void RunStarItemAction()
+	public void RunStarItemAction(int playerId)
 	{
-		new List<PangBall>(balls).ForEach(ball => ball.DestroyBallCompletely());
+		new List<PangBall>(balls).ForEach(ball => ball.DestroyBallCompletely(playerId));
 	}
 }

@@ -35,9 +35,15 @@ public class NextBallSpawner : MonoBehaviour
 	private void SpawnBalls(PangBall parentBall, GameObject ballPrefab)
 	{
 		var position = parentBall.transform.position;
-		var ball1 = Instantiate(ballPrefab, position, Quaternion.identity).GetComponent<PangBall>();
-		ball1.SetInitialDirection(PangBall.BallDirection.LEFT);
-		var ball2 = Instantiate(ballPrefab, position, Quaternion.identity).GetComponent<PangBall>();
-		ball2.SetInitialDirection(PangBall.BallDirection.RIGHT);
+		var ballLeft = Instantiate(ballPrefab, position, Quaternion.identity).GetComponent<PangBall>();
+		ballLeft.SetInitialDirection(PangBall.BallDirection.LEFT);
+		var ballRight = Instantiate(ballPrefab, position, Quaternion.identity).GetComponent<PangBall>();
+		ballRight.SetInitialDirection(PangBall.BallDirection.RIGHT);
+
+		if(parentBall.IsPaused())
+		{
+			ballLeft.Pause();
+			ballRight.Pause();
+		}
 	}
 }

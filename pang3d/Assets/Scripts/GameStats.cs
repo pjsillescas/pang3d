@@ -70,14 +70,16 @@ public class GameStats : MonoBehaviour
 	{
 		var score = ball.GetBallType() switch
 		{
-			PangBall.BallType.BALL1 => 100,
-			PangBall.BallType.BALL2 => 200,
-			PangBall.BallType.BALL3 => 300,
-			_ => 400,
+			PangBall.BallType.BALL1 => 400,
+			PangBall.BallType.BALL2 => 800,
+			PangBall.BallType.BALL3 => 1200,
+			_ => 1600,
 		};
 
-		player1Data.AddScore(score);
+		var playerId = ball.GetDestroyedBy();
+		PlayerDataDTO playerData = (playerId == 1) ? player1Data : player2Data;
+		playerData.AddScore(score);
 
-		OnPlayerDataChanged?.Invoke(this, player1Data);
+		OnPlayerDataChanged?.Invoke(this, playerData);
 	}
 }

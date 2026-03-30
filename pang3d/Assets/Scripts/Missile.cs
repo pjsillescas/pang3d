@@ -10,9 +10,11 @@ public class Missile : MonoBehaviour
 	private float maxDistance = 10.0f;
 
 	private Vector3 origin;
+	private int playerId;
 
-	public void Shoot(Vector3 position, float angle)
+	public void Shoot(Vector3 position, float angle, int playerId)
 	{
+		this.playerId = playerId;
 		transform.Rotate(0, 0, angle);
 		transform.position = position;
 		origin = position;
@@ -34,7 +36,7 @@ public class Missile : MonoBehaviour
 	{
 		if (other.TryGetComponent(out DestructibleObject destructibleObject))
 		{
-			destructibleObject.DestroyObject();
+			destructibleObject.DestroyObject(playerId);
 			DestroyMissile();
 		}
 		else if (other.CompareTag("Surface")) // Hard surfaces stop the hook

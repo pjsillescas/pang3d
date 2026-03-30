@@ -11,7 +11,7 @@ public class PangBall : MonoBehaviour
 	public static event EventHandler<PangBall> OnBallDestroyed;
 
 	[SerializeField]
-	private float ItemProbability = 0.7f;
+	private float ItemProbability = 0.5f;
 	[SerializeField]
 	private BallType ballType;
 	[SerializeField]
@@ -32,11 +32,16 @@ public class PangBall : MonoBehaviour
 	private float verticalVelocity;
 	private int direction = 1; // 1 = right, -1 = left
 	private float radius;
-	private bool isGamePaused;
+	private bool isPaused;
 	private float gravity;
 	private float horizontalSpeed;
 	private float bounceForce;
+	private int destroyedBy;
 
+	private void Awake()
+	{
+		isPaused = false;
+	}
 	private void OnEnable()
 	{
 		GameManager.OnPause += OnPause;
@@ -49,6 +54,8 @@ public class PangBall : MonoBehaviour
 		GameManager.OnUnpause -= OnUnpause;
 	}
 
+	public int GetDestroyedBy() => destroyedBy;
+
 	private void OnPause(object sender, EventArgs args)
 	{
 		Pause();
@@ -57,7 +64,7 @@ public class PangBall : MonoBehaviour
 
 	public void Pause()
 	{
-		isGamePaused = true;
+		isPaused = true;
 	}
 
 	private void OnUnpause(object sender, EventArgs args)
@@ -68,8 +75,10 @@ public class PangBall : MonoBehaviour
 
 	public void UnPause()
 	{
-		isGamePaused = false;
+		isPaused = false;
 	}
+
+	public bool IsPaused() => isPaused;
 
 	//private Vector3 directionVector;
 	private void UpdateRadius()
@@ -99,7 +108,6 @@ public class PangBall : MonoBehaviour
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
-		isGamePaused = false;
 		SetFastMode();
 		UpdateRadius();
 		verticalVelocity = 0;
@@ -120,7 +128,7 @@ public class PangBall : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if (isGamePaused)
+		if (isPaused)
 		{
 			return;
 		}
@@ -142,7 +150,7 @@ public class PangBall : MonoBehaviour
 
 	void OnCollisionEnter(Collision collision)
 	{
-		if (isGamePaused)
+		if (isPaused)
 		{
 			return;
 		}
@@ -180,8 +188,9 @@ public class PangBall : MonoBehaviour
 		}
 	}
 
-	private void DestroyBall(bool useSpawner)
+	private void DestroyBall(bool useSpawner, int playerId)
 	{
+		destroyedBy = playerId;
 		OnBallDestroyed?.Invoke(this, this);
 
 		SpawnItem();
@@ -194,13 +203,13 @@ public class PangBall : MonoBehaviour
 		Destroy(gameObject, 0.01f);
 	}
 
-	public void DestroyBall()
+	public void DestroyBall(int playerId)
 	{
-		DestroyBall(true);
+		DestroyBall(true, playerId);
 	}
 	
-	public void DestroyBallCompletely()
+	public void DestroyBallCompletely(int playerId)
 	{
-		DestroyBall(false);
+		DestroyBall(false, playerId);
 	}
 }

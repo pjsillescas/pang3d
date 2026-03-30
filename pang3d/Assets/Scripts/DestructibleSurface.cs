@@ -5,7 +5,7 @@ public class DestructibleSurface : DestructibleObject
 	[SerializeField]
 	private float ItemProbability = 0.7f;
 
-	public override void DestroyObject()
+	public override void DestroyObject(int _)
 	{
 		var itemSpawner = FindAnyObjectByType<ItemSpawner>();
 
