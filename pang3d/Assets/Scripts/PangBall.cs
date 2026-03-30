@@ -80,13 +80,10 @@ public class PangBall : MonoBehaviour
 
 	public bool IsPaused() => isPaused;
 
-	//private Vector3 directionVector;
 	private void UpdateRadius()
 	{
 		var collider = GetComponent<SphereCollider>();
 		radius = collider.radius * transform.localScale.x;
-
-		Debug.Log($"ball {name}: {radius}");
 	}
 
 	public BallType GetBallType() => ballType;
@@ -191,7 +188,6 @@ public class PangBall : MonoBehaviour
 	private void DestroyBall(bool useSpawner, int playerId)
 	{
 		destroyedBy = playerId;
-		OnBallDestroyed?.Invoke(this, this);
 
 		SpawnItem();
 
@@ -199,6 +195,8 @@ public class PangBall : MonoBehaviour
 		{
 			ballSpawner.SpawnNextBalls(this);
 		}
+		
+		OnBallDestroyed?.Invoke(this, this);
 
 		Destroy(gameObject, 0.01f);
 	}

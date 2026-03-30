@@ -4,5 +4,6 @@ using UnityEngine;
 public class LevelDataSO : ScriptableObject
 {
 	public string LevelName = "Level";
+	public string NextLevelName = "NextLevel";
 	public int Time = 200;
 }

@@ -147,18 +147,19 @@ public class PangThirdPersonController : MonoBehaviour
 
 	public void ActivateStairs()
 	{
-		Debug.Log("stairs on");
+		//Debug.Log("stairs on");
 		isInStairs = true;
 	}
 
 	public void DeactivateStairs()
 	{
-		Debug.Log("stairs off");
+		//Debug.Log("stairs off");
 		isInStairs = false;
 	}
 
 	private void Start()
 	{
+		Debug.Log("start");
 		_hasAnimator = TryGetComponent(out _animator);
 		inputManager = GetComponent<InputManager>();
 
@@ -190,9 +191,12 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		inputManager.OnSprintBegin -= OnSprintBegin;
-		inputManager.OnSprintEnd -= OnSprintEnd;
-		inputManager.OnHook -= OnHook;
+		if (inputManager != null)
+		{
+			inputManager.OnSprintBegin -= OnSprintBegin;
+			inputManager.OnSprintEnd -= OnSprintEnd;
+			inputManager.OnHook -= OnHook;
+		}
 
 		GameManager.OnPause -= OnPause;
 		GameManager.OnUnpause -= OnUnpause;

@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: PlaygroundLevel
   m_EditorClassIdentifier: Assembly-CSharp::LevelDataSO
   LevelName: Playground
+  NextLevelName: MainMenu
   Time: 300

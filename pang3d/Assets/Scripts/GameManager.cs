@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-	public enum GameResult { WON, LOST };
+	public enum GameResult { WON, LOST_LIFE, LOST_GAME };
 
 	public static event EventHandler OnGameStarted;
 	public static event EventHandler<GameResult> OnGameEnded;
@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
 		PangBall.OnBallDestroyed += OnBallDestroyed;
 
 		isGamePaused = false;
+		Time.timeScale = 1;
+
 	}
 
 	private void OnDestroy()
@@ -41,12 +43,15 @@ public class GameManager : MonoBehaviour
 
 		GameStats.OnPlayerDataChanged -= OnPlayerDataChanged;
 		OnGameEnded -= OnGameEndedMethod;
+		//PangThirdPersonController.OnPlayerKilled -= OnPlayerKilled;
+
 	}
 
 	private void OnGameEndedMethod(object sender, GameResult result)
 	{
 		var resultString = result == GameResult.WON ? "you won!!" : "you lost";
 		Debug.Log($"Game finished: {resultString}");
+		Time.timeScale = 0;
 	}
 
 	public void TogglePause()
@@ -77,6 +82,16 @@ public class GameManager : MonoBehaviour
 
 		if (balls.Count <= 0)
 		{
+			StartCoroutine(CheckForGameEnded());
+		}
+	}
+
+	private IEnumerator CheckForGameEnded()
+	{
+		yield return new WaitForSeconds(1f);
+
+		if (balls.Count <= 0)
+		{
 			OnGameEnded?.Invoke(this, GameResult.WON);
 		}
 	}
@@ -92,20 +107,30 @@ public class GameManager : MonoBehaviour
 		timeWidget.OnTimeout += OnTimeout;
 		GameStats.OnPlayerDataChanged += OnPlayerDataChanged;
 		OnGameEnded += OnGameEndedMethod;
+		//PangThirdPersonController.OnPlayerKilled += OnPlayerKilled;
 	}
-
+	
 	private void OnPlayerDataChanged(object sender, PlayerDataDTO playerData)
 	{
-		if(playerData.GetLives() <= 0)
+		var lastEvent = playerData.GetLastEvent();
+		if (lastEvent == PlayerDataDTO.PlayerDataEvent.LOST_LIFE)
 		{
-			OnGameEnded?.Invoke(this, GameResult.LOST);
+			if (playerData.GetLives() < 1)
+			{
+				Debug.LogWarning("lives out!!");
+				OnGameEnded?.Invoke(this, GameResult.LOST_GAME);
+			}
+			else
+			{
+				OnGameEnded?.Invoke(this, GameResult.LOST_LIFE);
+			}
 		}
 	}
 
 	private void OnTimeout(object sender, EventArgs args)
 	{
-		Debug.Log("time out");
-		OnGameEnded?.Invoke(this, GameResult.LOST);
+		Debug.LogWarning("time out");
+		OnGameEnded?.Invoke(this, GameResult.LOST_LIFE);
 	}
 
 	private const float CLOCK_TIMEOUT_SECONDS = 10;

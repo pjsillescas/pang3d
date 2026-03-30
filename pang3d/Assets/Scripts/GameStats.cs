@@ -9,13 +9,23 @@ public class GameStats : MonoBehaviour
 	private PlayerDataDTO player1Data;
 	private PlayerDataDTO player2Data;
 
-
 	private void Awake()
 	{
 		player1Data = new PlayerDataDTO(1);
 		player2Data = new PlayerDataDTO(2);
 
 		DontDestroyOnLoad(this);
+	}
+
+	public void ResetStats()
+	{
+		player1Data.Reset();
+		player2Data.Reset();
+	}
+
+	public PlayerDataDTO GetPlayerData(int playerId)
+	{
+		return playerId == 1 ? player1Data : player2Data;
 	}
 
 	private void Start()
@@ -45,7 +55,7 @@ public class GameStats : MonoBehaviour
 	{
 		var playerData = scoreStruct.playerId == 1 ? player1Data : player2Data;
 		playerData.AddScore(scoreStruct.score);
-		
+
 		OnPlayerDataChanged?.Invoke(this, playerData);
 	}
 

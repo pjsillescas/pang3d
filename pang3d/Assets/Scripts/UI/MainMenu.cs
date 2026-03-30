@@ -20,6 +20,7 @@ public class MainMenu : MonoBehaviour
 	private void StartButtonClick()
 	{
 		Debug.Log("Playground");
+		FindAnyObjectByType<GameStats>().ResetStats();
 		SceneManager.LoadScene(FirstLevel);
 	}
 }

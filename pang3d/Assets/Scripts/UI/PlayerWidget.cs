@@ -20,6 +20,13 @@ public class PlayerWidget : MonoBehaviour
 		GameStats.OnPlayerDataChanged += OnPlayerDataChanged;
 	}
 
+	void Start()
+	{
+		var gameStats = FindAnyObjectByType<GameStats>();
+		OnPlayerDataChanged(null, gameStats.GetPlayerData(1));
+		OnPlayerDataChanged(null, gameStats.GetPlayerData(2));
+	}
+
 	private void OnPlayerDataChanged(object sender, PlayerDataDTO playerData)
 	{
 		if (playerData.GetPlayerId() == PlayerId)
