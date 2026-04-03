@@ -95,6 +95,7 @@ public class PangThirdPersonController : MonoBehaviour
 	private int _animIDGrounded;
 	private int _animIDFreeFall;
 	private int _animIDMotionSpeed;
+	private int _animIDClimb;
 
 	private Animator _animator;
 	private InputManager inputManager;
@@ -149,12 +150,22 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		//Debug.Log("stairs on");
 		isInStairs = true;
+
+		if (_hasAnimator)
+		{
+			_animator.SetBool(_animIDClimb, true);
+		}
+
 	}
 
 	public void DeactivateStairs()
 	{
 		//Debug.Log("stairs off");
 		isInStairs = false;
+		if (_hasAnimator)
+		{
+			_animator.SetBool(_animIDClimb, false);
+		}
 	}
 
 	private void Start()
@@ -264,6 +275,7 @@ public class PangThirdPersonController : MonoBehaviour
 		_animIDGrounded = Animator.StringToHash("Grounded");
 		_animIDFreeFall = Animator.StringToHash("FreeFall");
 		_animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+		_animIDClimb = Animator.StringToHash("Climb");
 	}
 
 	private void GroundedCheck()
