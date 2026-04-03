@@ -370,6 +370,11 @@ public class PangThirdPersonController : MonoBehaviour
 		transform.SetPositionAndRotation(transform.position + velocity * Time.deltaTime,
 			new Quaternion(0, transform.rotation.y, 0, transform.rotation.w));
 
+		if(isInStairs)
+		{
+			transform.rotation = Quaternion.identity;
+		}
+
 		// update animator if using character
 		if (_hasAnimator)
 		{
