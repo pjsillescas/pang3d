@@ -116,6 +116,7 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private bool isShieldEnabled;
 	private HookType hookType;
+	private ShieldVisual _shieldVisual;
 
 	public int GetPlayerId() => PlayerId;
 
@@ -131,6 +132,7 @@ public class PangThirdPersonController : MonoBehaviour
 		_climbSpeed = 0.0f;
 		isShieldEnabled = false;
 		hookType = HookType.HOOK;
+		_shieldVisual = GetComponentInChildren<ShieldVisual>();
 	}
 
 	public void SetHookType(HookType hookType)
@@ -141,11 +143,19 @@ public class PangThirdPersonController : MonoBehaviour
 	public void ActivateShield()
 	{
 		isShieldEnabled = true;
+		if (_shieldVisual != null)
+		{
+			_shieldVisual.Activate();
+		}
 	}
 
 	public void DeactivateShield()
 	{
 		isShieldEnabled = false;
+		if (_shieldVisual != null)
+		{
+			_shieldVisual.Deactivate();
+		}
 	}
 
 	public void ActivateStairs()
