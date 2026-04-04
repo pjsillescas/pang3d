@@ -3965,7 +3965,7 @@ MonoBehaviour:
   AudioFoley: {fileID: 1232569227}
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips: []
-  Gravity: -200
+  Gravity: -1000
   Grounded: 1
   GroundedOffset: -0.14
   GroundedRadius: 0.28
@@ -5158,6 +5158,63 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 596124025}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &596387488
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 973574633378691855, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_Name
+      value: MachineGunItem
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.588792
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 4064869140461758069, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
 --- !u!1 &600831166
 GameObject:
   m_ObjectHideFlags: 0
@@ -10362,7 +10419,7 @@ MonoBehaviour:
   AudioFoley: {fileID: 464370057}
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips: []
-  Gravity: -200
+  Gravity: -1000
   Grounded: 1
   GroundedOffset: -0.14
   GroundedRadius: 0.28
@@ -25433,7 +25490,7 @@ MonoBehaviour:
   AudioFoley: {fileID: 735668326}
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips: []
-  Gravity: -200
+  Gravity: -1000
   Grounded: 1
   GroundedOffset: -0.14
   GroundedRadius: 0.28
@@ -28060,3 +28117,4 @@ SceneRoots:
   - {fileID: 1626232735101032105}
   - {fileID: 3652630914183525846}
   - {fileID: 176326605}
+  - {fileID: 596387488}

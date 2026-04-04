@@ -52,7 +52,8 @@ public class PangThirdPersonController : MonoBehaviour
 	private AudioClip[] FootstepAudioClips;
 	[Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
 	[SerializeField]
-	private float Gravity = -15.0f;
+	//private float Gravity = -15.0f;
+	private float Gravity = -1000.0f;
 	[Header("Player Grounded")]
 	[Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
 	[SerializeField]
