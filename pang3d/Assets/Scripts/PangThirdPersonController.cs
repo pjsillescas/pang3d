@@ -5,7 +5,8 @@ using static PangHook;
 [RequireComponent(typeof(InputManager))]
 public class PangThirdPersonController : MonoBehaviour
 {
-	public struct ScoreStruct {
+	public struct ScoreStruct
+	{
 		public int playerId;
 		public int score;
 	}
@@ -17,7 +18,7 @@ public class PangThirdPersonController : MonoBehaviour
 	[Tooltip("Player Id")]
 	[SerializeField]
 	private int PlayerId = 1;
-	
+
 	[Tooltip("Move speed of the character in m/s")]
 	[SerializeField]
 	private float MoveSpeed = 2.0f;
@@ -82,7 +83,7 @@ public class PangThirdPersonController : MonoBehaviour
 	[Tooltip("Missile Shoot Origin")]
 	[SerializeField]
 	private Transform ShootOrigin;
-	
+
 	// player
 	private float _speed;
 	private float _animationBlend;
@@ -232,14 +233,20 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void Shoot()
 	{
-		Debug.Log("Bang!");
-
 		float angle = 10f;
 		var missileLeft = Instantiate(MissilePrefab).GetComponent<Missile>();
 		missileLeft.Shoot(ShootOrigin.position + new Vector3(0.1f, 0, 0), -angle, PlayerId);
 
 		var missileRight = Instantiate(MissilePrefab).GetComponent<Missile>();
 		missileRight.Shoot(ShootOrigin.position + new Vector3(-0.1f, 0, 0), angle, PlayerId);
+
+		angle = 2.5f;
+		var missile2Left = Instantiate(MissilePrefab).GetComponent<Missile>();
+		missile2Left.Shoot(ShootOrigin.position + new Vector3(0.01f, 0, 0), -angle, PlayerId);
+
+		var missile2Right = Instantiate(MissilePrefab).GetComponent<Missile>();
+		missile2Right.Shoot(ShootOrigin.position + new Vector3(-0.01f, 0, 0), angle, PlayerId);
+
 	}
 
 	private void OnHookDestroyed()
@@ -251,7 +258,7 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		isSprinting = true;
 	}
-	
+
 	private void OnSprintEnd(object sender, EventArgs args)
 	{
 		isSprinting = false;
@@ -259,7 +266,7 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void Update()
 	{
-		if(isGamePaused)
+		if (isGamePaused)
 		{
 			return;
 		}
@@ -339,7 +346,7 @@ public class PangThirdPersonController : MonoBehaviour
 		{
 			targetSpeed = 0.0f;
 		}
-		
+
 		float inputMagnitude = 1f;
 		_speed = UpdateSpeed(targetSpeed, inputMagnitude);
 		var targetClimbSpeed = isInStairs ? ClimbSpeed * inputY : 0f;
@@ -370,7 +377,7 @@ public class PangThirdPersonController : MonoBehaviour
 		transform.SetPositionAndRotation(transform.position + velocity * Time.deltaTime,
 			new Quaternion(0, transform.rotation.y, 0, transform.rotation.w));
 
-		if(isInStairs)
+		if (isInStairs)
 		{
 			transform.rotation = Quaternion.identity;
 		}
@@ -406,7 +413,7 @@ public class PangThirdPersonController : MonoBehaviour
 			_verticalVelocity += Gravity * Time.deltaTime;
 		}
 	}
-	
+
 	private void OnDrawGizmosSelected()
 	{
 		var transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
@@ -419,7 +426,7 @@ public class PangThirdPersonController : MonoBehaviour
 			new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z),
 			GroundedRadius);
 	}
-	
+
 	// Animation event
 	public void OnFootstepPang(AnimationEvent animationEvent)
 	{

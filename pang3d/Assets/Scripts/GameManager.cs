@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour
 		OnGameEnded -= OnGameEndedMethod;
 		//PangThirdPersonController.OnPlayerKilled -= OnPlayerKilled;
 
+		Time.timeScale = 1;
 	}
 
 	private void OnGameEndedMethod(object sender, GameResult result)
