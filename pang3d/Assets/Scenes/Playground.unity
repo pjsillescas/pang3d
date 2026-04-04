@@ -19491,6 +19491,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ball1
       objectReference: {fileID: 0}
+    - target: {fileID: 2421738105168487083, guid: d8c85e06db5435c45a0de6dd8d65ecb8, type: 3}
+      propertyPath: bounceForceFast
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 8843944505038674988, guid: d8c85e06db5435c45a0de6dd8d65ecb8, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.84

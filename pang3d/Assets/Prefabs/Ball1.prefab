@@ -133,7 +133,7 @@ MonoBehaviour:
   InitialDirection: 1
   horizontalSpeedFast: 3
   gravityFast: 20
-  bounceForceFast: 10
+  bounceForceFast: 15
   horizontalSpeedSlow: 1
   gravitySlow: 5
   bounceForceSlow: 5

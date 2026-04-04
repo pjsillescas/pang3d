@@ -23,7 +23,7 @@ public class PangBall : MonoBehaviour
 	[SerializeField]
 	private float gravityFast = 20f;
 	[SerializeField]
-	private float bounceForceFast = 10f;
+	private float bounceForceFast = 15f;
 	[SerializeField]
 	private float horizontalSpeedSlow = 1f;
 	[SerializeField]
