@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SphereCollider))]
@@ -37,12 +39,17 @@ public class PangBall : MonoBehaviour
 	private float horizontalSpeed;
 	private float bounceForce;
 	private int destroyedBy;
+	private bool useGravity;
+	private bool isBouncing;
 
 	private void Awake()
 	{
 		isPaused = false;
+		useGravity = true;
+		isBouncing = false;
 	}
-	private void OnEnable()
+
+private void OnEnable()
 	{
 		GameManager.OnPause += OnPause;
 		GameManager.OnUnpause += OnUnpause;
@@ -105,9 +112,9 @@ public class PangBall : MonoBehaviour
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
+		verticalVelocity = 0;
 		SetFastMode();
 		UpdateRadius();
-		verticalVelocity = 0;
 
 		direction = InitialDirection == BallDirection.RIGHT ? 1 : -1;
 
@@ -136,7 +143,10 @@ public class PangBall : MonoBehaviour
 		pos.x += direction * horizontalSpeed * Time.deltaTime;
 
 		// Vertical movement
-		verticalVelocity -= gravity * Time.deltaTime;
+		if (useGravity)
+		{
+			verticalVelocity -= gravity * Time.deltaTime;
+		}
 		pos.y += verticalVelocity * Time.deltaTime;
 		pos.z = 0f;
 		transform.position = pos;
@@ -147,12 +157,12 @@ public class PangBall : MonoBehaviour
 
 	void OnCollisionEnter(Collision collision)
 	{
-		if (isPaused)
+		if (isPaused || isBouncing)
 		{
 			return;
 		}
 
-		if(collision.gameObject.TryGetComponent(out PangThirdPersonController controller))
+		if (collision.gameObject.TryGetComponent(out PangThirdPersonController controller))
 		{
 			controller.KillCharacter();
 			return;
@@ -164,7 +174,16 @@ public class PangBall : MonoBehaviour
 		// Floor check
 		if (Vector3.Dot(normal, Vector3.up) > 0.7f || collision.gameObject.CompareTag("Ground"))
 		{
-			verticalVelocity = bounceForce;
+			if (isBouncing)
+			{
+				return;
+			}
+			isBouncing = true;
+
+			// Debug.Log("boing");
+			//verticalVelocity = bounceForce;
+			//isBouncing = false;
+			StartCoroutine(SetBounceForce());
 			transform.position = new Vector3(transform.position.x, transform.position.y + radius, transform.position.z);
 			//directionVector = Vector3.up;
 		}
@@ -173,6 +192,39 @@ public class PangBall : MonoBehaviour
 			direction *= -1;
 			//directionVector = Vector3.Reflect(directionVector, normal);
 		}
+	}
+
+	private IEnumerator SetBounceForce()
+	{
+		const int FRAMES_PER_BOUNCE = 4;
+		//float deltaVelocity = bounceForce / FRAMES_PER_BOUNCE;
+		float deltaVelocity = bounceForce * 8f / 15f;
+		Debug.Log($"force {bounceForce} ({deltaVelocity})");
+
+		useGravity = false;
+		verticalVelocity = 0f;
+
+		for (int i = 0; i < FRAMES_PER_BOUNCE; i++)
+		{
+			//verticalVelocity += deltaVelocity;
+			float factor = i switch
+			{
+				0 => 8f,
+				1 => 4f,
+				2 => 2f,
+				3 => 1f,
+				_ => 1f,
+			};
+
+			verticalVelocity += deltaVelocity / factor;
+			yield return null;
+		}
+
+		Debug.Log($"vertical {verticalVelocity} ({bounceForce})");
+		useGravity = true;
+		
+		isBouncing = false;
+
 	}
 
 	private void SpawnItem()
@@ -195,7 +247,7 @@ public class PangBall : MonoBehaviour
 		{
 			ballSpawner.SpawnNextBalls(this);
 		}
-		
+
 		OnBallDestroyed?.Invoke(this, this);
 
 		Destroy(gameObject, 0.01f);
@@ -205,7 +257,7 @@ public class PangBall : MonoBehaviour
 	{
 		DestroyBall(true, playerId);
 	}
-	
+
 	public void DestroyBallCompletely(int playerId)
 	{
 		DestroyBall(false, playerId);
