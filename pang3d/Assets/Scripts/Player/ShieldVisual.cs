@@ -2,126 +2,215 @@ using UnityEngine;
 
 public class ShieldVisual : MonoBehaviour
 {
-    [SerializeField] private float ringRadius = 0.8f;
-    [SerializeField] private float ringThickness = 0.08f;
-    [SerializeField] private float pulseSpeed = 3f;
-    [SerializeField] private float pulseAmount = 0.1f;
-    [SerializeField] private float yOffset = 0.05f;
-    [SerializeField] private Color ringColor = new Color(0.3f, 0.8f, 1f, 0.8f);
-    [SerializeField] private Color glowColor = new Color(0.5f, 0.9f, 1f, 1f);
-    [SerializeField] private Material ringMaterial;
-    [SerializeField] private Material glowMaterial;
+	[SerializeField]
+	private float capsuleRadius = 0.5f;
+	[SerializeField]
+	private float capsuleHeight = 1.8f;
+	[SerializeField]
+	private Color plasmaColor = new(0.3f, 0.8f, 1f, 0.5f);
+	[SerializeField]
+	private Color glowColor = new(0.5f, 0.9f, 1f, 1f);
+	[SerializeField]
+	private float animationSpeed = 2f;
+	[SerializeField]
+	private float distortionStrength = 0.15f;
+	[SerializeField]
+	private float fresnelPower = 2f;
+	[SerializeField]
+	private float pulseSpeed = 3f;
+	[SerializeField]
+	private Vector3 yOffset = new(0, 0.5f, 0);
 
-    private LineRenderer _ringRenderer;
-    private LineRenderer _glowRenderer;
-    private GameObject _ringObject;
-    private GameObject _glowObject;
-    private bool _isActive;
-    private float _baseScale;
-    private float _activationTime;
+	private GameObject _capsuleObject;
+	private MeshFilter _meshFilter;
+	private MeshRenderer _meshRenderer;
+	private Material _plasmaMaterial;
+	private bool _isActive;
+	private float _activationTime;
 
-    private void Awake()
-    {
-        _ringObject = new GameObject("ShieldRing");
-        _ringObject.transform.SetParent(transform);
-        _ringObject.transform.localPosition = Vector3.zero;
-        _ringObject.transform.localRotation = Quaternion.identity;
+	private void Awake()
+	{
+		_capsuleObject = new GameObject("ShieldCapsule");
+		_capsuleObject.transform.SetParent(transform);
+		_capsuleObject.transform.SetLocalPositionAndRotation(yOffset, Quaternion.identity);
+		Mesh capsuleMesh = CreateCapsuleMesh(capsuleRadius, capsuleHeight);
 
-        _glowObject = new GameObject("ShieldGlow");
-        _glowObject.transform.SetParent(transform);
-        _glowObject.transform.localPosition = Vector3.zero;
-        _glowObject.transform.localRotation = Quaternion.identity;
+		_meshFilter = _capsuleObject.AddComponent<MeshFilter>();
+		_meshFilter.mesh = capsuleMesh;
 
-        _ringRenderer = _ringObject.AddComponent<LineRenderer>();
-        _glowRenderer = _glowObject.AddComponent<LineRenderer>();
+		_meshRenderer = _capsuleObject.AddComponent<MeshRenderer>();
+		_meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+		_meshRenderer.receiveShadows = false;
 
-        SetupRingRenderer(_ringRenderer, ringColor, ringThickness);
-        SetupRingRenderer(_glowRenderer, glowColor, ringThickness * 2.5f);
+		Shader shader = Shader.Find("Custom/PlasmaShield");
+		if (shader == null)
+		{
+			shader = Shader.Find("Standard");
+		}
 
-        DrawCircle(_ringRenderer, ringRadius);
-        DrawCircle(_glowRenderer, ringRadius + ringThickness);
+		_plasmaMaterial = new Material(shader);
+		_plasmaMaterial.SetColor("_Color", plasmaColor);
+		_plasmaMaterial.SetColor("_GlowColor", glowColor);
+		_plasmaMaterial.SetFloat("_Speed", animationSpeed);
+		_plasmaMaterial.SetFloat("_Strength", distortionStrength);
+		_plasmaMaterial.SetFloat("_FresnelPower", fresnelPower);
+		_plasmaMaterial.SetFloat("_PulseSpeed", pulseSpeed);
+		_plasmaMaterial.SetFloat("_Activation", 0f);
+		_plasmaMaterial.SetFloat("_Mode", 3f);
+		_plasmaMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+		_plasmaMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+		_plasmaMaterial.EnableKeyword("_ALPHABLEND_ON");
+		_plasmaMaterial.renderQueue = 3000;
 
-        _ringObject.SetActive(false);
-        _glowObject.SetActive(false);
-    }
+		_meshRenderer.material = _plasmaMaterial;
+		_capsuleObject.SetActive(false);
+	}
 
-    private void SetupRingRenderer(LineRenderer renderer, Color color, float width)
-    {
-        renderer.startWidth = width;
-        renderer.endWidth = width;
-        renderer.loop = true;
-        renderer.positionCount = 65;
-        renderer.useWorldSpace = false;
+	private Mesh CreateCapsuleMesh(float radius, float height)
+	{
+		var mesh = new Mesh
+		{
+			name = "PlasmaCapsule"
+		};
 
-        if (ringMaterial != null)
-        {
-            renderer.material = ringMaterial;
-        }
-        else
-        {
-            var mat = new Material(Shader.Find("Sprites/Default"));
-            mat.color = color;
-            renderer.material = mat;
-        }
+		int segments = 24;
+		int heightSegments = 12;
 
-        renderer.startColor = color;
-        renderer.endColor = color;
-    }
+		float halfHeight = height * 0.5f;
+		float hemisphereHeight = radius;
 
-    private void DrawCircle(LineRenderer renderer, float radius)
-    {
-        int segments = renderer.positionCount - 1;
-        for (int i = 0; i <= segments; i++)
-        {
-            float angle = (float)i / segments * 360f;
-            float radian = angle * Mathf.Deg2Rad;
-            float x = Mathf.Cos(radian) * radius;
-            float z = Mathf.Sin(radian) * radius;
-            renderer.SetPosition(i, new Vector3(x, yOffset, z));
-        }
-    }
+		int vertCount = (segments + 1) * (heightSegments + 1) * 2 + segments * 2 + 2;
+		Vector3[] vertices = new Vector3[vertCount];
+		Vector3[] normals = new Vector3[vertCount];
+		Vector2[] uvs = new Vector2[vertCount];
+		int[] triangles = new int[(segments * (heightSegments * 6 + 6)) * 2 + segments * segments * 6];
 
-    public void Activate()
-    {
-        if (_isActive) return;
+		int vertIndex = 0;
+		int triIndex = 0;
 
-        _isActive = true;
-        _activationTime = Time.time;
-        _ringObject.SetActive(true);
-        _glowObject.SetActive(true);
-    }
+		float totalHeight = halfHeight + hemisphereHeight * 0.8f;
 
-    public void Deactivate()
-    {
-        _isActive = false;
-        _ringObject.SetActive(false);
-        _glowObject.SetActive(false);
-    }
+		for (int y = 0; y <= heightSegments; y++)
+		{
+			float v = (float)y / heightSegments;
+			float posY = -totalHeight + v * totalHeight * 2;
 
-    private void Update()
-    {
-        if (!_isActive) return;
+			if (posY < -halfHeight + hemisphereHeight * 0.5f)
+			{
+				float t = Mathf.Clamp01((-halfHeight + hemisphereHeight * 0.5f - posY) / hemisphereHeight);
+				posY = -halfHeight + hemisphereHeight * 0.5f - Mathf.Sqrt(1 - t * t) * hemisphereHeight * 0.5f;
+			}
+			else if (posY > halfHeight - hemisphereHeight * 0.5f)
+			{
+				float t = Mathf.Clamp01((posY - (halfHeight - hemisphereHeight * 0.5f)) / hemisphereHeight);
+				posY = halfHeight - hemisphereHeight * 0.5f + Mathf.Sqrt(1 - t * t) * hemisphereHeight * 0.5f;
+			}
 
-        float elapsed = Time.time - _activationTime;
-        float pulse = 1f + Mathf.Sin(elapsed * pulseSpeed) * pulseAmount;
-        float breathe = 1f + Mathf.Sin(elapsed * pulseSpeed * 0.5f) * 0.05f;
+			for (int x = 0; x <= segments; x++)
+			{
+				float u = (float)x / segments;
+				float angle = u * Mathf.PI * 2;
 
-        float activationFade = Mathf.Clamp01(elapsed * 3f);
-        float scale = pulse * breathe * activationFade;
+				float adjustedY = posY;
+				float radiusMod = radius;
 
-        _ringObject.transform.localScale = new Vector3(scale, scale, scale);
-        _glowObject.transform.localScale = new Vector3(scale * 1.05f, scale * 1.05f, scale * 1.05f);
+				if (posY < -halfHeight + hemisphereHeight * 0.6f)
+				{
+					float sphereY = posY + halfHeight;
+					float sphereR = hemisphereHeight * 0.6f;
+					float distFromCenter = Mathf.Abs(sphereY) / sphereR;
+					if (distFromCenter < 1f)
+					{
+						float remaining = Mathf.Sqrt(1 - distFromCenter * distFromCenter);
+						radiusMod = radius * remaining;
+					}
+				}
+				else if (posY > halfHeight - hemisphereHeight * 0.6f)
+				{
+					float sphereY = posY - halfHeight;
+					float sphereR = hemisphereHeight * 0.6f;
+					float distFromCenter = Mathf.Abs(sphereY) / sphereR;
+					if (distFromCenter < 1f)
+					{
+						float remaining = Mathf.Sqrt(1 - distFromCenter * distFromCenter);
+						radiusMod = radius * remaining;
+					}
+				}
 
-        Color ringCol = ringColor;
-        ringCol.a *= activationFade;
-        _ringRenderer.startColor = ringCol;
-        _ringRenderer.endColor = ringCol;
+				float cos = Mathf.Cos(angle);
+				float sin = Mathf.Sin(angle);
+				vertices[vertIndex] = new Vector3(cos * radiusMod, adjustedY, sin * radiusMod);
 
-        Color glowCol = glowColor;
-        glowCol.a *= activationFade * 0.5f;
-        _glowRenderer.startColor = glowCol;
-        _glowRenderer.endColor = glowCol;
-    }
+				Vector3 outward = new Vector3(cos, 0, sin);
+				if (posY < -halfHeight + hemisphereHeight * 0.6f || posY > halfHeight - hemisphereHeight * 0.6f)
+				{
+					float sphereY = posY < 0 ? posY + halfHeight : posY - halfHeight;
+					outward = (vertices[vertIndex] - new Vector3(0, sphereY, 0)).normalized;
+				}
+				normals[vertIndex] = outward;
+				uvs[vertIndex] = new Vector2(u, v);
+				vertIndex++;
+			}
+		}
 
-    public bool IsActive => _isActive;
+		for (int y = 0; y < heightSegments; y++)
+		{
+			for (int x = 0; x < segments; x++)
+			{
+				int current = y * (segments + 1) + x;
+				int next = current + segments + 1;
+
+				triangles[triIndex++] = current;
+				triangles[triIndex++] = next;
+				triangles[triIndex++] = current + 1;
+
+				triangles[triIndex++] = current + 1;
+				triangles[triIndex++] = next;
+				triangles[triIndex++] = next + 1;
+			}
+		}
+
+		mesh.vertices = vertices;
+		mesh.normals = normals;
+		mesh.uv = uvs;
+		mesh.triangles = triangles;
+		mesh.RecalculateBounds();
+
+		return mesh;
+	}
+
+	public void Activate()
+	{
+		if (_isActive) return;
+
+		_isActive = true;
+		_activationTime = Time.time;
+		_capsuleObject.SetActive(true);
+		_plasmaMaterial.SetFloat("_Activation", 0.01f);
+	}
+
+	public void Deactivate()
+	{
+		_isActive = false;
+		_capsuleObject.SetActive(false);
+		if (_plasmaMaterial != null)
+		{
+			_plasmaMaterial.SetFloat("_Activation", 0f);
+		}
+	}
+
+	private void Update()
+	{
+		if (!_isActive || _plasmaMaterial == null) return;
+
+		float elapsed = Time.time - _activationTime;
+		float activation = Mathf.Clamp01(elapsed * 3f);
+
+		_plasmaMaterial.SetFloat("_Activation", activation);
+
+		float pulse = 1f + Mathf.Sin(elapsed * pulseSpeed) * 0.05f;
+		_capsuleObject.transform.localScale = new Vector3(pulse, 1f, pulse);
+	}
+
+	public bool IsActive => _isActive;
 }
