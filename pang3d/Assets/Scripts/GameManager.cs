@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+	private const float HOURGLASS_TIMEOUT_SECONDS = 10;
+
 	public enum GameResult { WON, LOST_LIFE, LOST_GAME };
 
 	public static event EventHandler OnGameStarted;
@@ -71,8 +73,17 @@ public class GameManager : MonoBehaviour
 
 	public bool IsGamePaused() => isGamePaused;
 
+	private void TrySetColor(PangBall ball)
+	{
+		if (levelInfoWidget != null)
+		{
+			ball.SetColor(levelInfoWidget.GetLevelData().LevelColor);
+		}
+	}
+
 	private void OnBallSpawned(object sender, PangBall ball)
 	{
+		TrySetColor(ball);
 		balls.Add(ball);
 		Debug.Log("ball spawned");
 	}
@@ -109,6 +120,8 @@ public class GameManager : MonoBehaviour
 		GameStats.OnPlayerDataChanged += OnPlayerDataChanged;
 		OnGameEnded += OnGameEndedMethod;
 		//PangThirdPersonController.OnPlayerKilled += OnPlayerKilled;
+
+		balls.ForEach(ball => TrySetColor(ball));
 	}
 	
 	private void OnPlayerDataChanged(object sender, PlayerDataDTO playerData)
@@ -176,8 +189,6 @@ public class GameManager : MonoBehaviour
 		Debug.Log("finish dynamite");
 
 	}
-
-	private const float HOURGLASS_TIMEOUT_SECONDS = 10;
 
 	public void RunHourglassItemAction()
 	{

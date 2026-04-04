@@ -15,3 +15,4 @@ MonoBehaviour:
   LevelName: Playground
   NextLevelName: MainMenu
   Time: 300
+  LevelColor: {r: 0, g: 1, b: 0.2477321, a: 1}

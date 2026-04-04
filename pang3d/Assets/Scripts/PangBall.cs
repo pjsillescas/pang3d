@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SphereCollider))]
+[RequireComponent(typeof(MeshRenderer))]
 public class PangBall : MonoBehaviour
 {
 	public enum BallType { BALL1, BALL2, BALL3, BALL4 }
@@ -49,7 +50,7 @@ public class PangBall : MonoBehaviour
 		isBouncing = false;
 	}
 
-private void OnEnable()
+	private void OnEnable()
 	{
 		GameManager.OnPause += OnPause;
 		GameManager.OnUnpause += OnUnpause;
@@ -86,6 +87,12 @@ private void OnEnable()
 	}
 
 	public bool IsPaused() => isPaused;
+
+	public void SetColor(Color color)
+	{
+		var meshRenderer = GetComponent<MeshRenderer>();
+		meshRenderer.material.SetColor("_BaseColor", color);
+	}
 
 	private void UpdateRadius()
 	{
