@@ -45,11 +45,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
   ItemPrefabs:
-  - {fileID: 7996682996778954610, guid: 99fa00693ac47ca4f928d9e684110f89, type: 3}
-  - {fileID: 161935988270764317, guid: 35d3b12a7ad1ca74dbf122645ca3a65f, type: 3}
-  - {fileID: 8246454248644309792, guid: 1f9890327a5c5f445a3e4acb089db7a8, type: 3}
-  - {fileID: 4428790832021690922, guid: 2a3ff3c37e648da47819977c0d3b5b27, type: 3}
-  - {fileID: 5759777267502162858, guid: 52ce9a372cb48574c9d5cbf99c1fd641, type: 3}
-  - {fileID: 8621452773943813531, guid: da7b43de54fae2849a609e0e7aa7f95d, type: 3}
-  - {fileID: 458485837086474198, guid: 93274eb3d9d98e04c8dadefe14079692, type: 3}
-  - {fileID: 7132391811746188280, guid: e8ccb97c4cc6fc242925f60155ba7df7, type: 3}
+  - {fileID: 1005542390306805225, guid: 7f303f0d7433abd458b8cb191abe998a, type: 3}
+  - {fileID: 2883409657685984874, guid: f6a8840b1d1823f42b765e2dc3a87e89, type: 3}
+  - {fileID: 5328451583013457752, guid: 6707f94071293ea4f9cf9246bfa83fa1, type: 3}
+  - {fileID: 5749363250807817510, guid: 764909c84d3c7a84194a3553bf1ec8f7, type: 3}
+  - {fileID: 8877060573357228021, guid: 05e8b6e64effe1f4c9691fa548d362b7, type: 3}
+  - {fileID: 4840456332680494292, guid: bdabdd9ef56ecd14cb7430ce772142e8, type: 3}
+  - {fileID: 2844591227843901947, guid: 49e49546f0da1cc44b55ff36abbef638, type: 3}
+  - {fileID: 4281427910336718025, guid: 4b39aebfc32b1a5468f1519945c40355, type: 3}
+  - {fileID: 2852768032763582560, guid: f2d906829fbd4314f8fccb4707b6e01e, type: 3}
+  - {fileID: 2658006675912828896, guid: 94da20135c5f0a547b55f817966af277, type: 3}
