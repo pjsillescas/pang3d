@@ -30,6 +30,7 @@ public class PangHook : MonoBehaviour
 	private CapsuleCollider capsuleCollider;
 	private Action onHookDestroyed;
 	private bool isGamePaused;
+	private bool canGrow;
 
 	void Awake()
 	{
@@ -41,6 +42,8 @@ public class PangHook : MonoBehaviour
 
 		capsuleCollider = GetComponent<CapsuleCollider>();
 		isGamePaused = false;
+
+		canGrow = true;
 	}
 
 	private void Start()
@@ -69,7 +72,7 @@ public class PangHook : MonoBehaviour
 
 	void Update()
 	{
-		if (!isShooting || isGamePaused)
+		if (!isShooting || isGamePaused || !canGrow)
 		{
 			return;
 		}
@@ -121,6 +124,11 @@ public class PangHook : MonoBehaviour
 
 	private void UpdateLine()
 	{
+		if(!canGrow)
+		{
+			return;
+		}
+
 		Vector3 start = origin;
 		Vector3 end = start + Vector3.up * currentLength;
 
@@ -180,6 +188,7 @@ public class PangHook : MonoBehaviour
 
 	private IEnumerator StopHookGrapple()
 	{
+		canGrow = false;
 		yield return new WaitForSeconds(GRAPPLE_TIMEOUT);
 
 		DestroyHook();
