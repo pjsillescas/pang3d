@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 58bd62d157f193e42a6bf52516fc5ae6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -128,11 +128,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a49b6358bf9f80243b83748e720d218f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PangBall
+  ItemProbability: 0.5
   ballType: 2
   InitialDirection: 1
-  horizontalSpeed: 3
-  gravity: 20
-  bounceForce: 15
+  horizontalSpeedFast: 3
+  gravityFast: 20
+  bounceForceFast: 10
+  horizontalSpeedSlow: 1
+  gravitySlow: 5
+  bounceForceSlow: 5
 --- !u!54 &1357802980920145810
 Rigidbody:
   m_ObjectHideFlags: 0

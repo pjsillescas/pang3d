@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1566665548726664036}
   - component: {fileID: 4840456332680494292}
   - component: {fileID: 9125079667632399863}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FruitItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
