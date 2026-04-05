@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SphereCollider))]
@@ -206,7 +205,7 @@ public class PangBall : MonoBehaviour
 		const int FRAMES_PER_BOUNCE = 4;
 		//float deltaVelocity = bounceForce / FRAMES_PER_BOUNCE;
 		float deltaVelocity = bounceForce * 8f / 15f;
-		Debug.Log($"force {bounceForce} ({deltaVelocity})");
+		//Debug.Log($"force {bounceForce} ({deltaVelocity})");
 
 		useGravity = false;
 		verticalVelocity = 0f;
@@ -227,7 +226,7 @@ public class PangBall : MonoBehaviour
 			yield return null;
 		}
 
-		Debug.Log($"vertical {verticalVelocity} ({bounceForce})");
+		//Debug.Log($"vertical {verticalVelocity} ({bounceForce})");
 		useGravity = true;
 		
 		isBouncing = false;

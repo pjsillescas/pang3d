@@ -1,23 +1,29 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
+[RequireComponent(typeof(InputManager))]
 public class MainMenu : MonoBehaviour
 {
 	[SerializeField]
 	private string FirstLevel = "Playground";
-	[SerializeField]
-	private Button StartButton;
+
+	private InputManager inputManager;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
-		Debug.Log("adding start button listener");
-		StartButton.onClick.RemoveAllListeners();
-		StartButton.onClick.AddListener(StartButtonClick);
+		inputManager = GetComponent<InputManager>();
+
+		inputManager.OnHook += StartGame;
 	}
 
-	private void StartButtonClick()
+	private void OnDestroy()
+	{
+		inputManager.OnHook -= StartGame;
+	}
+	
+	private void StartGame(object sender, EventArgs args)
 	{
 		Debug.Log("Playground");
 		FindAnyObjectByType<GameStats>().ResetStats();
