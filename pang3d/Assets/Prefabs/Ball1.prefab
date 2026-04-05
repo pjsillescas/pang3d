@@ -135,8 +135,8 @@ MonoBehaviour:
   gravityFast: 20
   bounceForceFast: 15
   horizontalSpeedSlow: 1
-  gravitySlow: 5
-  bounceForceSlow: 5
+  gravitySlow: 20
+  bounceForceSlow: 10
 --- !u!54 &2418982201424358142
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -33,6 +33,10 @@ public class ShieldVisual : MonoBehaviour
 		capsuleObject = new GameObject("ShieldCapsule");
 		capsuleObject.transform.SetParent(transform);
 		capsuleObject.transform.SetLocalPositionAndRotation(yOffset, Quaternion.identity);
+
+		capsuleRadius = 0.5f;
+		capsuleHeight = 2f;
+		
 		Mesh capsuleMesh = CreateCapsuleMesh(capsuleRadius, capsuleHeight);
 
 		meshFilter = capsuleObject.AddComponent<MeshFilter>();
@@ -42,7 +46,7 @@ public class ShieldVisual : MonoBehaviour
 		meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		meshRenderer.receiveShadows = false;
 
-		Shader shader = null;// Shader.Find("Custom/PlasmaShield");
+		Shader shader = Shader.Find("Custom/PlasmaShield");
 		if (shader == null)
 		{
 			shader = Shader.Find("Standard");
@@ -74,73 +78,68 @@ public class ShieldVisual : MonoBehaviour
 		};
 
 		int segments = 24;
-		int heightSegments = 12;
+		int heightSegments = 8;
 
 		float halfHeight = height * 0.5f;
-		float hemisphereHeight = radius;
+		float cylinderHeight = height - radius * 2f;
+		float hemisphereY = halfHeight - radius;
 
-		int vertCount = (segments + 1) * (heightSegments + 1) * 2 + segments * 2 + 2;
+		int vertCount = (segments + 1) * (heightSegments + 3) + 2;
 		var vertices = new Vector3[vertCount];
 		var normals = new Vector3[vertCount];
 		var uvs = new Vector2[vertCount];
-		int[] triangles = new int[(segments * (heightSegments * 6 + 6)) * 2 + segments * segments * 6];
+
+		int[] triangles = new int[segments * (heightSegments * 6 + 12)];
 
 		int vertIndex = 0;
 		int triIndex = 0;
 
-		float totalHeight = halfHeight + hemisphereHeight * 0.8f;
-
 		for (int y = 0; y <= heightSegments; y++)
 		{
 			float v = (float)y / heightSegments;
-			float posY = -totalHeight + v * totalHeight * 2;
+			float posY;
+
+			if (y == 0)
+			{
+				posY = -halfHeight + radius;
+			}
+			else if (y == heightSegments)
+			{
+				posY = halfHeight - radius;
+			}
+			else
+			{
+				float t = (float)y / heightSegments;
+				posY = Mathf.Lerp(-hemisphereY, hemisphereY, t);
+			}
+
+			posY += 1.5f;
 
 			for (int x = 0; x <= segments; x++)
 			{
 				float u = (float)x / segments;
 				float angle = u * Mathf.PI * 2;
-
-				float adjustedY = posY;
-				float radiusMod = radius;
-
-				if (posY < -halfHeight + hemisphereHeight * 0.6f)
-				{
-					float sphereY = posY + halfHeight;
-					float sphereR = hemisphereHeight * 0.6f;
-					float distFromCenter = Mathf.Abs(sphereY) / sphereR;
-					if (distFromCenter < 1f)
-					{
-						float remaining = Mathf.Sqrt(1 - distFromCenter * distFromCenter);
-						radiusMod = radius * remaining;
-					}
-				}
-				else if (posY > halfHeight - hemisphereHeight * 0.6f)
-				{
-					float sphereY = posY - halfHeight;
-					float sphereR = hemisphereHeight * 0.6f;
-					float distFromCenter = Mathf.Abs(sphereY) / sphereR;
-					if (distFromCenter < 1f)
-					{
-						float remaining = Mathf.Sqrt(1 - distFromCenter * distFromCenter);
-						radiusMod = radius * remaining;
-					}
-				}
-
 				float cos = Mathf.Cos(angle);
 				float sin = Mathf.Sin(angle);
-				vertices[vertIndex] = new Vector3(cos * radiusMod, adjustedY, sin * radiusMod);
 
-				var outward = new Vector3(cos, 0, sin);
-				if (posY < -halfHeight + hemisphereHeight * 0.6f || posY > halfHeight - hemisphereHeight * 0.6f)
-				{
-					float sphereY = posY < 0 ? posY + halfHeight : posY - halfHeight;
-					outward = (vertices[vertIndex] - new Vector3(0, sphereY, 0)).normalized;
-				}
-				normals[vertIndex] = outward;
+				vertices[vertIndex] = new Vector3(cos * radius, posY, sin * radius);
+				normals[vertIndex] = new Vector3(cos, 0, sin);
 				uvs[vertIndex] = new Vector2(u, v);
 				vertIndex++;
 			}
 		}
+
+		vertices[vertIndex] = new Vector3(0, -halfHeight, 0);
+		normals[vertIndex] = new Vector3(0, -1, 0);
+		uvs[vertIndex] = new Vector2(0.5f, 0);
+		int bottomCenter = vertIndex;
+		vertIndex++;
+
+		vertices[vertIndex] = new Vector3(0, halfHeight, 0);
+		normals[vertIndex] = new Vector3(0, 1, 0);
+		uvs[vertIndex] = new Vector2(0.5f, 1);
+		int topCenter = vertIndex;
+		vertIndex++;
 
 		for (int y = 0; y < heightSegments; y++)
 		{
@@ -157,6 +156,22 @@ public class ShieldVisual : MonoBehaviour
 				triangles[triIndex++] = next;
 				triangles[triIndex++] = next + 1;
 			}
+		}
+
+		int bottomRingStart = 0;
+		for (int x = 0; x < segments; x++)
+		{
+			triangles[triIndex++] = bottomCenter;
+			triangles[triIndex++] = bottomRingStart + x + 1;
+			triangles[triIndex++] = bottomRingStart + x;
+		}
+
+		int topRingStart = heightSegments * (segments + 1);
+		for (int x = 0; x < segments; x++)
+		{
+			triangles[triIndex++] = topRingStart + x;
+			triangles[triIndex++] = topRingStart + x + 1;
+			triangles[triIndex++] = topCenter;
 		}
 
 		mesh.vertices = vertices;

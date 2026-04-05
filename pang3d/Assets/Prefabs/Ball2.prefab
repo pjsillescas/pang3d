@@ -131,12 +131,12 @@ MonoBehaviour:
   ItemProbability: 0.5
   ballType: 1
   InitialDirection: 1
-  horizontalSpeedFast: 3
+  horizontalSpeedFast: 4
   gravityFast: 20
   bounceForceFast: 15
-  horizontalSpeedSlow: 1
-  gravitySlow: 5
-  bounceForceSlow: 5
+  horizontalSpeedSlow: 2
+  gravitySlow: 20
+  bounceForceSlow: 10
 --- !u!54 &6507234995415167622
 Rigidbody:
   m_ObjectHideFlags: 0
