@@ -11448,6 +11448,7 @@ MonoBehaviour:
   fresnelPower: 2
   pulseSpeed: 3
   yOffset: {x: 0, y: 0.5, z: 0}
+  PlasmaMaterial: {fileID: 2100000, guid: c290ec402243a34469cab60823466dd8, type: 2}
 --- !u!1 &1434846204
 GameObject:
   m_ObjectHideFlags: 0
@@ -11501,6 +11502,7 @@ MonoBehaviour:
   fresnelPower: 2
   pulseSpeed: 3
   yOffset: {x: 0, y: 0.5, z: 0}
+  PlasmaMaterial: {fileID: 2100000, guid: c290ec402243a34469cab60823466dd8, type: 2}
 --- !u!1 &1439715880
 GameObject:
   m_ObjectHideFlags: 0
@@ -14149,6 +14151,7 @@ MonoBehaviour:
   fresnelPower: 2
   pulseSpeed: 3
   yOffset: {x: 0, y: 0.5, z: 0}
+  PlasmaMaterial: {fileID: 2100000, guid: c290ec402243a34469cab60823466dd8, type: 2}
 --- !u!1 &1840455149
 GameObject:
   m_ObjectHideFlags: 0

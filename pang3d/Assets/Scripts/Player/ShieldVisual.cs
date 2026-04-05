@@ -20,6 +20,8 @@ public class ShieldVisual : MonoBehaviour
 	private float pulseSpeed = 3f;
 	[SerializeField]
 	private Vector3 yOffset = new(0, 0.5f, 0);
+	[SerializeField]
+	private Material PlasmaMaterial;
 
 	private GameObject capsuleObject;
 	private MeshFilter meshFilter;
@@ -46,13 +48,17 @@ public class ShieldVisual : MonoBehaviour
 		meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		meshRenderer.receiveShadows = false;
 
+		/*
 		Shader shader = Shader.Find("Custom/PlasmaShield");
 		if (shader == null)
 		{
 			shader = Shader.Find("Standard");
 		}
+		*/
 
-		plasmaMaterial = new Material(shader);
+
+		//plasmaMaterial = new Material(shader);
+		plasmaMaterial = PlasmaMaterial;
 		plasmaMaterial.SetColor("_Color", plasmaColor);
 		plasmaMaterial.SetColor("_GlowColor", glowColor);
 		plasmaMaterial.SetFloat("_Speed", animationSpeed);
