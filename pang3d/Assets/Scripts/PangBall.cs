@@ -20,15 +20,15 @@ public class PangBall : MonoBehaviour
 	[SerializeField]
 	private BallDirection InitialDirection = BallDirection.RIGHT;
 	[SerializeField]
-	private float horizontalSpeedFast = 3f;
+	private float horizontalSpeedFast = 5f;
 	[SerializeField]
 	private float gravityFast = 20f;
 	[SerializeField]
 	private float bounceForceFast = 15f;
 	[SerializeField]
-	private float horizontalSpeedSlow = 1f;
+	private float horizontalSpeedSlow = 3f;
 	[SerializeField]
-	private float gravitySlow = 5f;
+	private float gravitySlow = 20f;
 	[SerializeField]
 	private float bounceForceSlow = 5f;
 

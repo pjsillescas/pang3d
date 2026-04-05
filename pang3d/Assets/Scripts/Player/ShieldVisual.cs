@@ -21,54 +21,54 @@ public class ShieldVisual : MonoBehaviour
 	[SerializeField]
 	private Vector3 yOffset = new(0, 0.5f, 0);
 
-	private GameObject _capsuleObject;
-	private MeshFilter _meshFilter;
-	private MeshRenderer _meshRenderer;
-	private Material _plasmaMaterial;
-	private bool _isActive;
-	private float _activationTime;
+	private GameObject capsuleObject;
+	private MeshFilter meshFilter;
+	private MeshRenderer meshRenderer;
+	private Material plasmaMaterial;
+	private bool isActive;
+	private float activationTime;
 
 	private void Awake()
 	{
-		_capsuleObject = new GameObject("ShieldCapsule");
-		_capsuleObject.transform.SetParent(transform);
-		_capsuleObject.transform.SetLocalPositionAndRotation(yOffset, Quaternion.identity);
+		capsuleObject = new GameObject("ShieldCapsule");
+		capsuleObject.transform.SetParent(transform);
+		capsuleObject.transform.SetLocalPositionAndRotation(yOffset, Quaternion.identity);
 		Mesh capsuleMesh = CreateCapsuleMesh(capsuleRadius, capsuleHeight);
 
-		_meshFilter = _capsuleObject.AddComponent<MeshFilter>();
-		_meshFilter.mesh = capsuleMesh;
+		meshFilter = capsuleObject.AddComponent<MeshFilter>();
+		meshFilter.mesh = capsuleMesh;
 
-		_meshRenderer = _capsuleObject.AddComponent<MeshRenderer>();
-		_meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-		_meshRenderer.receiveShadows = false;
+		meshRenderer = capsuleObject.AddComponent<MeshRenderer>();
+		meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+		meshRenderer.receiveShadows = false;
 
-		Shader shader = Shader.Find("Custom/PlasmaShield");
+		Shader shader = null;// Shader.Find("Custom/PlasmaShield");
 		if (shader == null)
 		{
 			shader = Shader.Find("Standard");
 		}
 
-		_plasmaMaterial = new Material(shader);
-		_plasmaMaterial.SetColor("_Color", plasmaColor);
-		_plasmaMaterial.SetColor("_GlowColor", glowColor);
-		_plasmaMaterial.SetFloat("_Speed", animationSpeed);
-		_plasmaMaterial.SetFloat("_Strength", distortionStrength);
-		_plasmaMaterial.SetFloat("_FresnelPower", fresnelPower);
-		_plasmaMaterial.SetFloat("_PulseSpeed", pulseSpeed);
-		_plasmaMaterial.SetFloat("_Activation", 0f);
-		_plasmaMaterial.SetFloat("_Mode", 3f);
-		_plasmaMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-		_plasmaMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-		_plasmaMaterial.EnableKeyword("_ALPHABLEND_ON");
-		_plasmaMaterial.renderQueue = 3000;
+		plasmaMaterial = new Material(shader);
+		plasmaMaterial.SetColor("_Color", plasmaColor);
+		plasmaMaterial.SetColor("_GlowColor", glowColor);
+		plasmaMaterial.SetFloat("_Speed", animationSpeed);
+		plasmaMaterial.SetFloat("_Strength", distortionStrength);
+		plasmaMaterial.SetFloat("_FresnelPower", fresnelPower);
+		plasmaMaterial.SetFloat("_PulseSpeed", pulseSpeed);
+		plasmaMaterial.SetFloat("_Activation", 0f);
+		plasmaMaterial.SetFloat("_Mode", 3f);
+		plasmaMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+		plasmaMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+		plasmaMaterial.EnableKeyword("_ALPHABLEND_ON");
+		plasmaMaterial.renderQueue = 3000;
 
-		_meshRenderer.material = _plasmaMaterial;
-		_capsuleObject.SetActive(false);
+		meshRenderer.material = plasmaMaterial;
+		capsuleObject.SetActive(false);
 	}
 
 	private Mesh CreateCapsuleMesh(float radius, float height)
 	{
-		var mesh = new Mesh
+		var mesh = new Mesh()
 		{
 			name = "PlasmaCapsule"
 		};
@@ -80,9 +80,9 @@ public class ShieldVisual : MonoBehaviour
 		float hemisphereHeight = radius;
 
 		int vertCount = (segments + 1) * (heightSegments + 1) * 2 + segments * 2 + 2;
-		Vector3[] vertices = new Vector3[vertCount];
-		Vector3[] normals = new Vector3[vertCount];
-		Vector2[] uvs = new Vector2[vertCount];
+		var vertices = new Vector3[vertCount];
+		var normals = new Vector3[vertCount];
+		var uvs = new Vector2[vertCount];
 		int[] triangles = new int[(segments * (heightSegments * 6 + 6)) * 2 + segments * segments * 6];
 
 		int vertIndex = 0;
@@ -94,17 +94,6 @@ public class ShieldVisual : MonoBehaviour
 		{
 			float v = (float)y / heightSegments;
 			float posY = -totalHeight + v * totalHeight * 2;
-
-			if (posY < -halfHeight + hemisphereHeight * 0.5f)
-			{
-				float t = Mathf.Clamp01((-halfHeight + hemisphereHeight * 0.5f - posY) / hemisphereHeight);
-				posY = -halfHeight + hemisphereHeight * 0.5f - Mathf.Sqrt(1 - t * t) * hemisphereHeight * 0.5f;
-			}
-			else if (posY > halfHeight - hemisphereHeight * 0.5f)
-			{
-				float t = Mathf.Clamp01((posY - (halfHeight - hemisphereHeight * 0.5f)) / hemisphereHeight);
-				posY = halfHeight - hemisphereHeight * 0.5f + Mathf.Sqrt(1 - t * t) * hemisphereHeight * 0.5f;
-			}
 
 			for (int x = 0; x <= segments; x++)
 			{
@@ -141,7 +130,7 @@ public class ShieldVisual : MonoBehaviour
 				float sin = Mathf.Sin(angle);
 				vertices[vertIndex] = new Vector3(cos * radiusMod, adjustedY, sin * radiusMod);
 
-				Vector3 outward = new Vector3(cos, 0, sin);
+				var outward = new Vector3(cos, 0, sin);
 				if (posY < -halfHeight + hemisphereHeight * 0.6f || posY > halfHeight - hemisphereHeight * 0.6f)
 				{
 					float sphereY = posY < 0 ? posY + halfHeight : posY - halfHeight;
@@ -181,36 +170,39 @@ public class ShieldVisual : MonoBehaviour
 
 	public void Activate()
 	{
-		if (_isActive) return;
+		if (isActive)
+		{
+			return;
+		}
 
-		_isActive = true;
-		_activationTime = Time.time;
-		_capsuleObject.SetActive(true);
-		_plasmaMaterial.SetFloat("_Activation", 0.01f);
+		isActive = true;
+		activationTime = Time.time;
+		capsuleObject.SetActive(true);
+		plasmaMaterial.SetFloat("_Activation", 0.01f);
 	}
 
 	public void Deactivate()
 	{
-		_isActive = false;
-		_capsuleObject.SetActive(false);
-		if (_plasmaMaterial != null)
+		isActive = false;
+		capsuleObject.SetActive(false);
+		if (plasmaMaterial != null)
 		{
-			_plasmaMaterial.SetFloat("_Activation", 0f);
+			plasmaMaterial.SetFloat("_Activation", 0f);
 		}
 	}
 
 	private void Update()
 	{
-		if (!_isActive || _plasmaMaterial == null) return;
+		if (!isActive || plasmaMaterial == null) return;
 
-		float elapsed = Time.time - _activationTime;
+		float elapsed = Time.time - activationTime;
 		float activation = Mathf.Clamp01(elapsed * 3f);
 
-		_plasmaMaterial.SetFloat("_Activation", activation);
+		plasmaMaterial.SetFloat("_Activation", activation);
 
 		float pulse = 1f + Mathf.Sin(elapsed * pulseSpeed) * 0.05f;
-		_capsuleObject.transform.localScale = new Vector3(pulse, 1f, pulse);
+		capsuleObject.transform.localScale = new Vector3(pulse, 1f, pulse);
 	}
 
-	public bool IsActive => _isActive;
+	public bool IsActive => isActive;
 }
