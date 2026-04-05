@@ -122,8 +122,24 @@ public class GameManager : MonoBehaviour
 		//PangThirdPersonController.OnPlayerKilled += OnPlayerKilled;
 
 		balls.ForEach(ball => TrySetColor(ball));
+
+		StartCoroutine(StartGame());
 	}
-	
+
+	private IEnumerator StartGame()
+	{
+		var initGameWidget = FindAnyObjectByType<InitGameWidget>();
+		initGameWidget.gameObject.SetActive(true);
+
+		TogglePause();
+		yield return new WaitForSeconds(2f);
+
+		initGameWidget.gameObject.SetActive(false);
+		
+		TogglePause();
+	}
+
+
 	private void OnPlayerDataChanged(object sender, PlayerDataDTO playerData)
 	{
 		var lastEvent = playerData.GetLastEvent();
