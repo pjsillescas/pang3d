@@ -21,6 +21,27 @@ public class TimeWidget : MonoBehaviour
 		isTimerPaused = false;
 	}
 
+	private void OnEnable()
+	{
+		GameManager.OnPause += OnPause;
+		GameManager.OnUnpause += OnUnpause;
+	}
+
+	private void OnDisable()
+	{
+		GameManager.OnPause -= OnPause;
+		GameManager.OnUnpause -= OnUnpause;
+	}
+
+	private void OnPause(object sender, EventArgs args)
+	{
+		PauseTimer();
+	}
+	private void OnUnpause(object sender, EventArgs args)
+	{
+		UnpauseTimer();
+	}
+
 	public void StartTimer(int maxTime)
 	{
 		currentTime = maxTime;
@@ -61,11 +82,9 @@ public class TimeWidget : MonoBehaviour
 	private IEnumerator DoTimer()
 	{
 		var waitForOneSecond = new WaitForSeconds(1);
-		string timeStr;
 		while (currentTime > 0)
 		{
-			timeStr = currentTime.ToString("D3");
-			TimeText.text = $"Time: {timeStr}";
+			DisplayTime();
 
 			if (isTimerPaused)
 			{
@@ -74,11 +93,20 @@ public class TimeWidget : MonoBehaviour
 			}
 
 			yield return waitForOneSecond;
-			currentTime--;
+			if(!isTimerPaused)
+			{
+				currentTime--;
+			}
 		}
-		timeStr = currentTime.ToString("D3");
-		TimeText.text = $"Time: {timeStr}";
+
+		DisplayTime();
 
 		OnTimeout?.Invoke(this,EventArgs.Empty);
+	}
+
+	private void DisplayTime()
+	{
+		var timeStr = currentTime.ToString("D3");
+		TimeText.text = $"Time: {timeStr}";
 	}
 }
