@@ -12,14 +12,26 @@ public class PlayerChoices : MonoBehaviour
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
-		playerInits = FindAnyObjectByType<PlayerInits>();
+		DontDestroyOnLoad(this);
 
+		playerInits = null;
 		//TrySpawnPlayer1();
 		//TrySpawnPlayer2();
 	}
 
+	private PlayerInits GetPlayerInits()
+	{
+		if (playerInits == null)
+		{
+			playerInits = FindAnyObjectByType<PlayerInits>();
+		}
+
+		return playerInits;
+	}
+
 	public void TrySpawnPlayer1()
 	{
+		var playerInits = GetPlayerInits();
 		if (playerInits != null && Player1Prefab != null)
 		{
 			playerInits.SpawnPlayer(Player1Prefab, 1);
@@ -28,6 +40,7 @@ public class PlayerChoices : MonoBehaviour
 
 	public void TrySpawnPlayer2()
 	{
+		var playerInits = GetPlayerInits();
 		if (playerInits != null && Player2Prefab != null)
 		{
 			playerInits.SpawnPlayer(Player2Prefab, 2);
