@@ -128,6 +128,14 @@ public class GameManager : MonoBehaviour
 
 	private IEnumerator StartGame()
 	{
+		//var playerInits = FindAnyObjectByType<PlayerInits>();
+		var playerChoices = FindAnyObjectByType<PlayerChoices>();
+
+		playerChoices.TrySpawnPlayer1();
+		playerChoices.TrySpawnPlayer2();
+
+		yield return new WaitForSeconds(0.1f);
+
 		var initGameWidget = FindAnyObjectByType<InitGameWidget>();
 		initGameWidget.gameObject.SetActive(true);
 

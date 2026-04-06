@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using static PangHook;
 
-[RequireComponent(typeof(InputManager))]
 public class PangThirdPersonController : MonoBehaviour
 {
 	public struct ScoreStruct
@@ -184,7 +183,7 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		Debug.Log("start");
 		_hasAnimator = TryGetComponent(out _animator);
-		inputManager = GetComponent<InputManager>();
+		inputManager = FindAnyObjectByType<InputManager>();
 
 		isSprinting = false;
 		inputManager.OnSprintBegin += OnSprintBegin;
@@ -225,8 +224,13 @@ public class PangThirdPersonController : MonoBehaviour
 		GameManager.OnUnpause -= OnUnpause;
 	}
 
-	private void OnHook(object sender, EventArgs args)
+	private void OnHook(object sender, int playerId)
 	{
+		if(playerId != PlayerId)
+		{
+			return;
+		}
+
 		if (hookType == HookType.MACHINE_GUN)
 		{
 			Shoot();
@@ -265,14 +269,20 @@ public class PangThirdPersonController : MonoBehaviour
 		currentHooksShot = Math.Clamp(currentHooksShot - 1, 0, maxHooksToShoot);
 	}
 
-	private void OnSprintBegin(object sender, EventArgs args)
+	private void OnSprintBegin(object sender, int playerId)
 	{
-		isSprinting = true;
+		if (playerId == PlayerId)
+		{
+			isSprinting = true;
+		}
 	}
 
-	private void OnSprintEnd(object sender, EventArgs args)
+	private void OnSprintEnd(object sender, int playerId)
 	{
-		isSprinting = false;
+		if (playerId == PlayerId)
+		{
+			isSprinting = false;
+		}
 	}
 
 	private void Update()
@@ -282,7 +292,7 @@ public class PangThirdPersonController : MonoBehaviour
 			return;
 		}
 
-		OnMove(inputManager.GetMoveVector());
+		OnMove(inputManager.GetMoveVector(PlayerId));
 		JumpAndGravity();
 		GroundedCheck();
 	}

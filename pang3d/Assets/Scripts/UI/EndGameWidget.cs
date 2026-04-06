@@ -50,7 +50,7 @@ public class EndGameWidget : MonoBehaviour
 		inputManager.OnHook += OnGoToNextLevel;
 	}
 
-	private void OnGoToNextLevel(object sender, EventArgs args)
+	private void OnGoToNextLevel(object sender, int playerId)
 	{
 		var levelData = levelInfoWidget.GetLevelData();
 		string nextLevel = gameResult switch

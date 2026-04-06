@@ -23,7 +23,7 @@ public class MainMenu : MonoBehaviour
 		inputManager.OnHook -= StartGame;
 	}
 	
-	private void StartGame(object sender, EventArgs args)
+	private void StartGame(object sender, int playerId)
 	{
 		Debug.Log("Playground");
 		FindAnyObjectByType<GameStats>().ResetStats();

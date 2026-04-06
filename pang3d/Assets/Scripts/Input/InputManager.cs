@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-	public event EventHandler OnHook;
-	public event EventHandler OnShoot;
-	public event EventHandler OnSprintBegin;
-	public event EventHandler OnSprintEnd;
+	public event EventHandler<int> OnHook;
+	public event EventHandler<int> OnShoot;
+	public event EventHandler<int> OnSprintBegin;
+	public event EventHandler<int> OnSprintEnd;
 
 	private InputActions input;
 	private bool isEnabled;
@@ -35,8 +35,14 @@ public class InputManager : MonoBehaviour
 		isEnabled = false;
 	}
 
-	public Vector2 GetMoveVector()
+	public Vector2 GetMoveVector(int playerId)
 	{
+		if (playerId == 1)
+		{
+			return input.Player.Move.ReadValue<Vector2>();
+		}
+		
+		// Player 2 move when ready
 		return input.Player.Move.ReadValue<Vector2>();
 	}
 
@@ -50,22 +56,22 @@ public class InputManager : MonoBehaviour
 
 		if (input.Player.Shoot.WasPressedThisFrame())
 		{
-			OnShoot?.Invoke(this, EventArgs.Empty);
+			OnShoot?.Invoke(this, 1);
 		}
 
 		if (input.Player.Hook.WasPressedThisFrame())
 		{
-			OnHook?.Invoke(this, EventArgs.Empty);
+			OnHook?.Invoke(this, 1);
 		}
 
 		if (input.Player.Sprint.WasPressedThisFrame())
 		{
-			OnSprintBegin?.Invoke(this, EventArgs.Empty);
+			OnSprintBegin?.Invoke(this, 1);
 		}
 
 		if (input.Player.Sprint.WasReleasedThisFrame())
 		{
-			OnSprintEnd?.Invoke(this, EventArgs.Empty);
+			OnSprintEnd?.Invoke(this, 1);
 		}
 
 		if (input.Player.Pause.WasReleasedThisFrame())
