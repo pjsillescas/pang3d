@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class NextBallSpawner : MonoBehaviour
 {
@@ -10,7 +8,9 @@ public class NextBallSpawner : MonoBehaviour
 	private GameObject Ball3Prefab;
 	[SerializeField]
 	private GameObject Ball4Prefab;
-
+	[SerializeField]
+	private float SpawnVerticalSpeed = 5;
+	
 	public void SpawnNextBalls(PangBall ball)
 	{
 		Debug.Log(ball);
@@ -42,6 +42,12 @@ public class NextBallSpawner : MonoBehaviour
 		
 		ballLeft.SetSpeedMode(parentBall.GetSpeedMode());
 		ballRight.SetSpeedMode(parentBall.GetSpeedMode());
+
+		ballLeft.AddVerticalSpeed(SpawnVerticalSpeed);
+		ballRight.AddVerticalSpeed(SpawnVerticalSpeed);
+
+		ballLeft.GoHarmless();
+		ballRight.GoHarmless();
 
 		if (parentBall.IsPaused())
 		{

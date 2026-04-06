@@ -39,6 +39,7 @@ public class PangBall : MonoBehaviour
 	private bool isBouncing;
 	private float deltaTimeFactor;
 	private SpeedMode speedMode;
+	private bool isHarmless;
 
 	public SpeedMode GetSpeedMode() => speedMode;
 	public void SetSpeedMode(SpeedMode speedMode)
@@ -53,12 +54,18 @@ public class PangBall : MonoBehaviour
 		}
 	}
 
+	public void AddVerticalSpeed(float speed)
+	{
+		verticalVelocity += speed;
+	}
+
 	private void Awake()
 	{
 		// Flags
 		isPaused = false;
 		useGravity = true;
 		isBouncing = false;
+		isHarmless = false;
 
 		// Velocities
 		verticalVelocity = 0;
@@ -149,6 +156,20 @@ public class PangBall : MonoBehaviour
 		direction = InitialDirection == BallDirection.RIGHT ? 1 : -1;
 	}
 
+	public void GoHarmless()
+	{
+		StartCoroutine(GoHarmlessCoroutine());
+	}
+
+	private IEnumerator GoHarmlessCoroutine()
+	{
+		isHarmless = true;
+
+		yield return new WaitForSeconds(1f);
+
+		isHarmless = false;
+	}
+
 	// Update is called once per frame
 	void Update()
 	{
@@ -184,7 +205,7 @@ public class PangBall : MonoBehaviour
 			return;
 		}
 
-		if (collision.gameObject.TryGetComponent(out PangThirdPersonController controller))
+		if (collision.gameObject.TryGetComponent(out PangThirdPersonController controller) && !isHarmless)
 		{
 			var hasShield = controller.HasShield();
 			controller.KillCharacter();
