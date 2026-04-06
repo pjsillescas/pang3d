@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - Stairs
   - Surface
+  - Shield
   layers:
   - Default
   - TransparentFX

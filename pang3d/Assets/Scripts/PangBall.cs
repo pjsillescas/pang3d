@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class PangBall : MonoBehaviour
 {
+	public enum SpeedMode { SLOW, FAST }
 	public enum BallType { BALL1, BALL2, BALL3, BALL4 }
 	public enum BallDirection { LEFT, RIGHT }
 
@@ -36,12 +38,33 @@ public class PangBall : MonoBehaviour
 	private bool useGravity;
 	private bool isBouncing;
 	private float deltaTimeFactor;
+	private SpeedMode speedMode;
+
+	public SpeedMode GetSpeedMode() => speedMode;
+	public void SetSpeedMode(SpeedMode speedMode)
+	{
+		if(speedMode == SpeedMode.FAST)
+		{
+			SetFastMode();
+		}
+		else
+		{
+			SetSlowMode();
+		}
+	}
 
 	private void Awake()
 	{
+		// Flags
 		isPaused = false;
 		useGravity = true;
 		isBouncing = false;
+
+		// Velocities
+		verticalVelocity = 0;
+		SetFastMode();
+		direction = InitialDirection == BallDirection.RIGHT ? 1 : -1;
+
 	}
 
 	private void OnEnable()
@@ -98,22 +121,22 @@ public class PangBall : MonoBehaviour
 
 	public void SetFastMode()
 	{
+		Debug.Log("fast mode");
+		speedMode = SpeedMode.FAST;
 		deltaTimeFactor = 1.0f;
 	}
 
 	public void SetSlowMode()
 	{
+		Debug.Log("slow mode");
+		speedMode = SpeedMode.SLOW;
 		deltaTimeFactor = DeltatimeFactorSlow;
 	}
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
-		verticalVelocity = 0;
-		SetFastMode();
 		UpdateRadius();
-
-		direction = InitialDirection == BallDirection.RIGHT ? 1 : -1;
 
 		//directionVector = new Vector3(1, 1, 0).normalized;
 
@@ -165,6 +188,12 @@ public class PangBall : MonoBehaviour
 		{
 			controller.KillCharacter();
 			return;
+		}
+
+		if (collision.gameObject.CompareTag("Shield"))
+		{
+			Debug.Log($"ball {name} colliding with shield => destroyed");
+			Destroy(gameObject, 0.01f);
 		}
 
 		ContactPoint contact = collision.contacts[0];

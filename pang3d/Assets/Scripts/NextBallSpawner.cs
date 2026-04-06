@@ -39,8 +39,11 @@ public class NextBallSpawner : MonoBehaviour
 		ballLeft.SetInitialDirection(PangBall.BallDirection.LEFT);
 		var ballRight = Instantiate(ballPrefab, position, Quaternion.identity).GetComponent<PangBall>();
 		ballRight.SetInitialDirection(PangBall.BallDirection.RIGHT);
+		
+		ballLeft.SetSpeedMode(parentBall.GetSpeedMode());
+		ballRight.SetSpeedMode(parentBall.GetSpeedMode());
 
-		if(parentBall.IsPaused())
+		if (parentBall.IsPaused())
 		{
 			ballLeft.Pause();
 			ballRight.Pause();
