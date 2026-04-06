@@ -19,28 +19,23 @@ public class PangBall : MonoBehaviour
 	[SerializeField]
 	private BallDirection InitialDirection = BallDirection.RIGHT;
 	[SerializeField]
-	private float horizontalSpeedFast = 5f;
+	private float horizontalSpeed = 5f;
 	[SerializeField]
-	private float gravityFast = 20f;
+	private float gravity = 20f;
 	[SerializeField]
-	private float bounceForceFast = 15f;
+	private float bounceForce = 15f;
 	[SerializeField]
-	private float horizontalSpeedSlow = 3f;
-	[SerializeField]
-	private float gravitySlow = 20f;
-	[SerializeField]
-	private float bounceForceSlow = 5f;
+	private float DeltatimeFactorSlow = 0.5f;
+	
 
 	private float verticalVelocity;
 	private int direction = 1; // 1 = right, -1 = left
 	private float radius;
 	private bool isPaused;
-	private float gravity;
-	private float horizontalSpeed;
-	private float bounceForce;
 	private int destroyedBy;
 	private bool useGravity;
 	private bool isBouncing;
+	private float deltaTimeFactor;
 
 	private void Awake()
 	{
@@ -103,16 +98,12 @@ public class PangBall : MonoBehaviour
 
 	public void SetFastMode()
 	{
-		gravity = gravityFast;
-		horizontalSpeed = horizontalSpeedFast;
-		bounceForce = bounceForceFast;
+		deltaTimeFactor = 1.0f;
 	}
 
 	public void SetSlowMode()
 	{
-		gravity = gravitySlow;
-		horizontalSpeed = horizontalSpeedSlow;
-		bounceForce = bounceForceSlow;
+		deltaTimeFactor = DeltatimeFactorSlow;
 	}
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -145,15 +136,17 @@ public class PangBall : MonoBehaviour
 
 		Vector3 pos = transform.position;
 
+		var time = Time.deltaTime * deltaTimeFactor;
+
 		// Horizontal movement
-		pos.x += direction * horizontalSpeed * Time.deltaTime;
+		pos.x += direction * horizontalSpeed * time;
 
 		// Vertical movement
 		if (useGravity)
 		{
-			verticalVelocity -= gravity * Time.deltaTime;
+			verticalVelocity -= gravity * time;
 		}
-		pos.y += verticalVelocity * Time.deltaTime;
+		pos.y += verticalVelocity * time;
 		pos.z = 0f;
 		transform.position = pos;
 
