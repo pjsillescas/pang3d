@@ -186,7 +186,13 @@ public class PangBall : MonoBehaviour
 
 		if (collision.gameObject.TryGetComponent(out PangThirdPersonController controller))
 		{
+			var hasShield = controller.HasShield();
 			controller.KillCharacter();
+
+			if(hasShield)
+			{
+				DestroyBall(controller.GetPlayerId());
+			}
 			return;
 		}
 

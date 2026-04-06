@@ -157,6 +157,11 @@ public class PangThirdPersonController : MonoBehaviour
 		}
 	}
 
+	public bool HasShield()
+	{
+		return isShieldEnabled;
+	}
+
 	public void ActivateStairs()
 	{
 		//Debug.Log("stairs on");
