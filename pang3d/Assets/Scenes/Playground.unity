@@ -12452,6 +12452,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 737865664259085656, guid: dbc3d68216b29fe42a7895fcb8ca9b59, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 737865664259085656, guid: dbc3d68216b29fe42a7895fcb8ca9b59, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 737865664259085656, guid: dbc3d68216b29fe42a7895fcb8ca9b59, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -11.6951065
+      objectReference: {fileID: 0}
     - target: {fileID: 3025698619261240552, guid: dbc3d68216b29fe42a7895fcb8ca9b59, type: 3}
       propertyPath: m_Name
       value: CameraSetup
@@ -13767,6 +13779,7 @@ GameObject:
   - component: {fileID: 8944336656349189698}
   - component: {fileID: 9078993846310988380}
   - component: {fileID: 1746586487}
+  - component: {fileID: 9078993846310988381}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -13810,9 +13823,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
+    y: 0.016499996
     width: 1
-    height: 1
+    height: 0.967
   near clip plane: 0.2
   far clip plane: 500
   field of view: 60.000004
@@ -13842,7 +13855,7 @@ Transform:
   m_GameObject: {fileID: 8944336656349189697}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 3.85, z: -11.842249}
+  m_LocalPosition: {x: 4.5, y: 3.85, z: -11.6951065}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13957,6 +13970,19 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &9078993846310988381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8944336656349189697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c450a4674c97aa47bd1f30774fd6611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraLetterbox
+  targetAspect: 2
 --- !u!4 &9105477279360051215
 Transform:
   m_ObjectHideFlags: 0
