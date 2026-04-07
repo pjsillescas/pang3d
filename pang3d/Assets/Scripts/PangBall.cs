@@ -15,7 +15,7 @@ public class PangBall : MonoBehaviour
 	public static event EventHandler<PangBall> OnBallDestroyed;
 
 	[SerializeField]
-	private float ItemProbability = 0.5f;
+	private float ItemProbability = 0.3f;
 	[SerializeField]
 	private BallType ballType;
 	[SerializeField]
@@ -40,7 +40,8 @@ public class PangBall : MonoBehaviour
 	private float deltaTimeFactor;
 	private SpeedMode speedMode;
 	private bool isHarmless;
-
+	bool isDestroying;
+	
 	public SpeedMode GetSpeedMode() => speedMode;
 	public void SetSpeedMode(SpeedMode speedMode)
 	{
@@ -66,6 +67,7 @@ public class PangBall : MonoBehaviour
 		useGravity = true;
 		isBouncing = false;
 		isHarmless = false;
+		isDestroying = false;
 
 		// Velocities
 		verticalVelocity = 0;
@@ -193,9 +195,6 @@ public class PangBall : MonoBehaviour
 		pos.y += verticalVelocity * time;
 		pos.z = 0f;
 		transform.position = pos;
-
-		//var displacement = speed * Time.deltaTime * directionVector;
-		//transform.position += displacement;
 	}
 
 	void OnCollisionEnter(Collision collision)
@@ -235,17 +234,12 @@ public class PangBall : MonoBehaviour
 			}
 			isBouncing = true;
 
-			// Debug.Log("boing");
-			//verticalVelocity = bounceForce;
-			//isBouncing = false;
 			StartCoroutine(SetBounceForce());
 			transform.position = new Vector3(transform.position.x, transform.position.y + radius, transform.position.z);
-			//directionVector = Vector3.up;
 		}
 		else
 		{
 			direction *= -1;
-			//directionVector = Vector3.Reflect(directionVector, normal);
 		}
 	}
 
@@ -294,6 +288,13 @@ public class PangBall : MonoBehaviour
 
 	private void DestroyBall(bool useSpawner, int playerId)
 	{
+		if(isDestroying)
+		{
+			return;
+		}
+
+		isDestroying = true;
+
 		destroyedBy = playerId;
 
 		SpawnItem();

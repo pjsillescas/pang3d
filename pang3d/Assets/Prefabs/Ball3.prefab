@@ -128,15 +128,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a49b6358bf9f80243b83748e720d218f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PangBall
-  ItemProbability: 0.5
+  ItemProbability: 0.3
   ballType: 2
   InitialDirection: 1
-  horizontalSpeedFast: 5
-  gravityFast: 20
-  bounceForceFast: 15
-  horizontalSpeedSlow: 1
-  gravitySlow: 20
-  bounceForceSlow: 10
+  horizontalSpeed: 5
+  gravity: 20
+  bounceForce: 15
+  DeltatimeFactorSlow: 0.5
 --- !u!54 &1357802980920145810
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -179,6 +177,7 @@ MonoBehaviour:
   Ball2Prefab: {fileID: 5112342978501835597, guid: 481757c0dba4cac4a8591baf75520b0f, type: 3}
   Ball3Prefab: {fileID: 8827009311782660699}
   Ball4Prefab: {fileID: 168846878799532490, guid: 264af3d8265cee642a286f8f89882cff, type: 3}
+  SpawnVerticalSpeed: 5
 --- !u!114 &8177042897350253771
 MonoBehaviour:
   m_ObjectHideFlags: 0
