@@ -1,0 +1,265 @@
+using System;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+
+public class CharacterSelectionWidget : MonoBehaviour
+{
+	public event EventHandler<GameObject> OnCharacterSelected;
+
+	[Serializable]
+	public class CharacterOption
+	{
+		public GameObject Prefab;
+		public string CharacterName;
+	}
+
+	[SerializeField]
+	private int PlayerId = 1;
+
+	[SerializeField]
+	private List<CharacterOption> characters = new();
+
+	[SerializeField]
+	private Transform characterContainer;
+
+	[SerializeField]
+	private TextMeshProUGUI characterNameText;
+
+	[SerializeField]
+	private float rotationSpeed = 50f;
+
+	[SerializeField]
+	private bool autoRotate = true;
+
+	private int currentIndex = 0;
+	private GameObject currentCharacterInstance;
+	private bool isActive = false;
+	private InputManager inputManager;
+
+	private void Start()
+	{
+		inputManager = FindAnyObjectByType<InputManager>();
+		inputManager.OnHook += OnSelectCharacter;
+		inputManager.OnMove += OnCharacterCarousel;
+	}
+
+	void Update()
+	{
+		if (!isActive) return;
+
+		//HandleInput();
+		HandleRotation();
+	}
+
+	private void OnSelectCharacter(object sender, int playerId)
+	{
+		SelectCurrentCharacter();
+	}
+
+	private void OnCharacterCarousel(object sender, InputManager.MoveData data)
+	{
+		if(data.playerId != PlayerId)
+		{
+			return;
+		}
+
+		var threshold = 0.01f;
+		var x = data.movement.x;
+
+		if (x >= threshold)
+		{
+			NextCharacter();
+		}
+		else if (x <= -threshold)
+		{
+			PreviousCharacter();
+		}
+
+	}
+
+	/*
+	private void HandleInput()
+	{
+		var threshold = 0.01f;
+
+		var vector = inputManager.GetMoveVector(PlayerId);
+
+		var x = vector.x;
+
+		if (x >= threshold)
+		{
+			NextCharacter();
+		}
+		else if (x <= -threshold)
+		{
+			PreviousCharacter();
+		}
+
+		/*
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            NextCharacter();
+        }
+        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            PreviousCharacter();
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SelectCurrentCharacter();
+        }
+        * /
+	}
+	*/
+
+	private void HandleRotation()
+	{
+		if (currentCharacterInstance != null && autoRotate)
+		{
+			currentCharacterInstance.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+		}
+	}
+
+	public void SetCharacters(List<CharacterOption> newCharacters)
+	{
+		characters = newCharacters;
+		if (characters.Count > 0)
+		{
+			currentIndex = 0;
+			ShowCurrentCharacter();
+		}
+	}
+
+	public void AddCharacter(GameObject prefab, string name)
+	{
+		characters.Add(new CharacterOption { Prefab = prefab, CharacterName = name });
+		if (characters.Count == 1)
+		{
+			currentIndex = 0;
+			ShowCurrentCharacter();
+		}
+	}
+
+	public void ClearCharacters()
+	{
+		characters.Clear();
+		DestroyCurrentCharacter();
+		currentIndex = 0;
+	}
+
+	public void Activate()
+	{
+		isActive = true;
+		if (characters.Count > 0)
+		{
+			ShowCurrentCharacter();
+		}
+	}
+
+	public void Deactivate()
+	{
+		isActive = false;
+	}
+
+	public void NextCharacter()
+	{
+		if (characters.Count == 0)
+		{
+			return;
+		}
+
+		currentIndex = (currentIndex + 1) % characters.Count;
+		ShowCurrentCharacter();
+	}
+
+	public void PreviousCharacter()
+	{
+		if (characters.Count == 0) return;
+		/*
+		currentIndex--;
+		if (currentIndex < 0)
+		{
+			currentIndex = characters.Count - 1;
+		}
+		*/
+		currentIndex = (currentIndex - 1 + characters.Count) % characters.Count;
+		ShowCurrentCharacter();
+	}
+
+	public void SelectCurrentCharacter()
+	{
+		if (characters.Count == 0) return;
+
+		OnCharacterSelected?.Invoke(this, characters[currentIndex].Prefab);
+	}
+
+	public GameObject GetSelectedCharacter()
+	{
+		if (characters.Count == 0) return null;
+		return characters[currentIndex].Prefab;
+	}
+
+	public string GetSelectedCharacterName()
+	{
+		if (characters.Count == 0) return "";
+		return characters[currentIndex].CharacterName;
+	}
+
+	public int GetCurrentIndex()
+	{
+		return currentIndex;
+	}
+
+	public int GetCharacterCount()
+	{
+		return characters.Count;
+	}
+
+	private void ShowCurrentCharacter()
+	{
+		if (characters.Count == 0)
+		{
+			return;
+		}
+
+		DestroyCurrentCharacter();
+
+		CharacterOption option = characters[currentIndex];
+		if (option.Prefab != null)
+		{
+			currentCharacterInstance = Instantiate(option.Prefab, characterContainer);
+			currentCharacterInstance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+			currentCharacterInstance.GetComponent<PangThirdPersonController>().enabled = false;
+
+			CenterCameraOnCharacter();
+		}
+
+		if (characterNameText != null)
+		{
+			characterNameText.text = option.CharacterName;
+		}
+	}
+
+	private void CenterCameraOnCharacter()
+	{
+		Camera.main.transform.position = characterContainer.position + new Vector3(0f, 1f, 3f);
+		Camera.main.transform.LookAt(characterContainer.position + Vector3.up);
+	}
+
+	private void DestroyCurrentCharacter()
+	{
+		if (currentCharacterInstance != null)
+		{
+			Destroy(currentCharacterInstance);
+			currentCharacterInstance = null;
+		}
+	}
+
+	private void OnDestroy()
+	{
+		DestroyCurrentCharacter();
+		inputManager.OnHook -= OnSelectCharacter;
+		inputManager.OnMove -= OnCharacterCarousel;
+	}
+}

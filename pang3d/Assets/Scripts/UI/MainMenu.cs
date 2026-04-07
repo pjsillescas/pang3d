@@ -9,18 +9,20 @@ public class MainMenu : MonoBehaviour
 	private string FirstLevel = "Playground";
 
 	private InputManager inputManager;
+	private CharacterSelectionWidget characterSelectionWidget;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
 		inputManager = GetComponent<InputManager>();
+		characterSelectionWidget = FindAnyObjectByType<CharacterSelectionWidget>();
 
-		inputManager.OnHook += StartGame;
+		inputManager.OnHook += ChooseCharacter;
 	}
 
 	private void OnDestroy()
 	{
-		inputManager.OnHook -= StartGame;
+		inputManager.OnHook -= ChooseCharacter;
 	}
 	
 	private void StartGame(object sender, int playerId)
@@ -28,5 +30,16 @@ public class MainMenu : MonoBehaviour
 		Debug.Log("Playground");
 		FindAnyObjectByType<GameStats>().ResetStats();
 		SceneManager.LoadScene(FirstLevel);
+	}
+
+	private void ChooseCharacter(object sender, int playerId)
+	{
+		var widget = characterSelectionWidget;
+		//widget.AddCharacter(playerMalePrefab, "Male");
+		//widget.AddCharacter(playerFemalePrefab, "Female");
+		widget.OnCharacterSelected += (sender, prefab) => {
+			Debug.Log($"Selected: {prefab.name}");
+		};
+		widget.Activate();
 	}
 }

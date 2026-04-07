@@ -3,10 +3,17 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
+	public class MoveData
+	{
+		public int playerId;
+		public Vector2 movement;
+	}
+
 	public event EventHandler<int> OnHook;
 	public event EventHandler<int> OnShoot;
 	public event EventHandler<int> OnSprintBegin;
 	public event EventHandler<int> OnSprintEnd;
+	public event EventHandler<MoveData> OnMove;
 
 	private InputActions input;
 	private bool isEnabled;
@@ -54,6 +61,11 @@ public class InputManager : MonoBehaviour
 			return;
 		}
 
+		if (input.Player.Move.WasPressedThisFrame())
+		{
+			OnMove?.Invoke(this, new() { playerId = 1, movement = GetMoveVector(1) });
+		}
+		
 		if (input.Player.Shoot.WasPressedThisFrame())
 		{
 			OnShoot?.Invoke(this, 1);
