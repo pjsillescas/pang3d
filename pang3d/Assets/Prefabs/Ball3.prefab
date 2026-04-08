@@ -131,8 +131,8 @@ MonoBehaviour:
   ItemProbability: 0.3
   ballType: 2
   InitialDirection: 1
-  horizontalSpeed: 5
-  gravity: 20
+  horizontalSpeed: 4
+  gravity: 17
   bounceForce: 15
   DeltatimeFactorSlow: 0.5
 --- !u!54 &1357802980920145810
