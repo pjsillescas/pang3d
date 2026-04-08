@@ -19,6 +19,22 @@ public class PlayerChoices : MonoBehaviour
 		//TrySpawnPlayer2();
 	}
 
+	public void SetPlayerCharacter(int playerId, PlayerCharacterSO character)
+	{
+		if(playerId == 1)
+		{
+			Player1Prefab = character.CharacterPrefab;
+		}
+		else if (playerId == 2)
+		{
+			Player2Prefab = character.CharacterPrefab;
+		}
+		else
+		{
+			Debug.LogError($"Invalid player {playerId}");
+		}
+	}
+
 	private PlayerInits GetPlayerInits()
 	{
 		if (playerInits == null)

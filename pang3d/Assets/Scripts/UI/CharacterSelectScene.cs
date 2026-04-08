@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static CharacterSelectionWidget;
 
 public class CharacterSelectScene : MonoBehaviour
 {
@@ -26,11 +27,11 @@ public class CharacterSelectScene : MonoBehaviour
 		}
 	}
 
-	private void OnCharacterSelected(object sender, GameObject selectedPrefab)
+	private void OnCharacterSelected(object sender, SelectedCharacterData selectedPrefab)
 	{
-		Debug.Log($"Character selected: {selectedPrefab.name}");
+		Debug.Log($"Character selected: {selectedPrefab.character.name}");
 
-		PlayerPrefs.SetString("SelectedCharacter", selectedPrefab.name);
+		PlayerPrefs.SetString("SelectedCharacter", selectedPrefab.character.name);
 
 		SceneManager.LoadScene("Level1");
 	}

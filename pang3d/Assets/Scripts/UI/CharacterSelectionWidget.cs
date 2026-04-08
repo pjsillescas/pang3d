@@ -5,26 +5,27 @@ using UnityEngine;
 
 public class CharacterSelectionWidget : MonoBehaviour
 {
-	public event EventHandler<GameObject> OnCharacterSelected;
-
-	[Serializable]
-	public class CharacterOption
+	public class SelectedCharacterData
 	{
-		public GameObject Prefab;
-		public string CharacterName;
+		public int playerId;
+		public PlayerCharacterSO character;
 	}
+
+	public event EventHandler<SelectedCharacterData> OnCharacterSelected;
 
 	[SerializeField]
 	private int PlayerId = 1;
 
 	[SerializeField]
-	private List<CharacterOption> characters = new();
+	private List<PlayerCharacterSO> characters = new();
 
 	[SerializeField]
 	private Transform characterContainer;
 
 	[SerializeField]
 	private TextMeshProUGUI characterNameText;
+	[SerializeField]
+	private TextMeshProUGUI selectionTitleText;
 
 	[SerializeField]
 	private float rotationSpeed = 50f;
@@ -32,13 +33,20 @@ public class CharacterSelectionWidget : MonoBehaviour
 	[SerializeField]
 	private bool autoRotate = true;
 
-	private int currentIndex = 0;
+	private int currentIndex;
 	private GameObject currentCharacterInstance;
-	private bool isActive = false;
+	private bool isActive;
 	private InputManager inputManager;
+
+	private void Awake()
+	{
+		currentIndex = 0;
+		isActive = false;
+	}
 
 	private void Start()
 	{
+		selectionTitleText.text = $"Select character Player {PlayerId}";
 		inputManager = FindAnyObjectByType<InputManager>();
 		inputManager.OnHook += OnSelectCharacter;
 		inputManager.OnMove += OnCharacterCarousel;
@@ -46,9 +54,11 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	void Update()
 	{
-		if (!isActive) return;
+		if (!isActive)
+		{
+			return;
+		}
 
-		//HandleInput();
 		HandleRotation();
 	}
 
@@ -75,43 +85,7 @@ public class CharacterSelectionWidget : MonoBehaviour
 		{
 			PreviousCharacter();
 		}
-
 	}
-
-	/*
-	private void HandleInput()
-	{
-		var threshold = 0.01f;
-
-		var vector = inputManager.GetMoveVector(PlayerId);
-
-		var x = vector.x;
-
-		if (x >= threshold)
-		{
-			NextCharacter();
-		}
-		else if (x <= -threshold)
-		{
-			PreviousCharacter();
-		}
-
-		/*
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            NextCharacter();
-        }
-        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            PreviousCharacter();
-        }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SelectCurrentCharacter();
-        }
-        * /
-	}
-	*/
 
 	private void HandleRotation()
 	{
@@ -121,7 +95,7 @@ public class CharacterSelectionWidget : MonoBehaviour
 		}
 	}
 
-	public void SetCharacters(List<CharacterOption> newCharacters)
+	public void SetCharacters(List<PlayerCharacterSO> newCharacters)
 	{
 		characters = newCharacters;
 		if (characters.Count > 0)
@@ -133,7 +107,7 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	public void AddCharacter(GameObject prefab, string name)
 	{
-		characters.Add(new CharacterOption { Prefab = prefab, CharacterName = name });
+		characters.Add(new() { CharacterPrefab = prefab, CharacterName = name });
 		if (characters.Count == 1)
 		{
 			currentIndex = 0;
@@ -150,6 +124,7 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	public void Activate()
 	{
+		gameObject.SetActive(true);
 		isActive = true;
 		if (characters.Count > 0)
 		{
@@ -159,6 +134,7 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	public void Deactivate()
 	{
+		gameObject.SetActive(false);
 		isActive = false;
 	}
 
@@ -175,34 +151,42 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	public void PreviousCharacter()
 	{
-		if (characters.Count == 0) return;
-		/*
-		currentIndex--;
-		if (currentIndex < 0)
+		if (characters.Count == 0)
 		{
-			currentIndex = characters.Count - 1;
+			return;
 		}
-		*/
+
 		currentIndex = (currentIndex - 1 + characters.Count) % characters.Count;
 		ShowCurrentCharacter();
 	}
 
 	public void SelectCurrentCharacter()
 	{
-		if (characters.Count == 0) return;
-
-		OnCharacterSelected?.Invoke(this, characters[currentIndex].Prefab);
+		if (characters.Count == 0)
+		{
+			return;
+		}
+		
+		OnCharacterSelected?.Invoke(this, new() { playerId = PlayerId, character = characters[currentIndex] });
 	}
 
 	public GameObject GetSelectedCharacter()
 	{
-		if (characters.Count == 0) return null;
-		return characters[currentIndex].Prefab;
+		if (characters.Count == 0)
+		{
+			return null;
+		}
+
+		return characters[currentIndex].CharacterPrefab;
 	}
 
 	public string GetSelectedCharacterName()
 	{
-		if (characters.Count == 0) return "";
+		if (characters.Count == 0)
+		{
+			return "";
+		}
+
 		return characters[currentIndex].CharacterName;
 	}
 
@@ -225,11 +209,11 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 		DestroyCurrentCharacter();
 
-		CharacterOption option = characters[currentIndex];
-		if (option.Prefab != null)
+		var option = characters[currentIndex];
+		if (option.CharacterPrefab != null)
 		{
-			currentCharacterInstance = Instantiate(option.Prefab, characterContainer);
-			currentCharacterInstance.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+			currentCharacterInstance = Instantiate(option.CharacterPrefab, characterContainer);
+			currentCharacterInstance.transform.SetLocalPositionAndRotation(Vector3.zero, new Quaternion(0, 180, 0, 0));
 			currentCharacterInstance.GetComponent<PangThirdPersonController>().enabled = false;
 
 			CenterCameraOnCharacter();
@@ -259,7 +243,10 @@ public class CharacterSelectionWidget : MonoBehaviour
 	private void OnDestroy()
 	{
 		DestroyCurrentCharacter();
-		inputManager.OnHook -= OnSelectCharacter;
-		inputManager.OnMove -= OnCharacterCarousel;
+		if (inputManager != null)
+		{
+			inputManager.OnHook -= OnSelectCharacter;
+			inputManager.OnMove -= OnCharacterCarousel;
+		}
 	}
 }
