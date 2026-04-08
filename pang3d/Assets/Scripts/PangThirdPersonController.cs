@@ -9,9 +9,16 @@ public class PangThirdPersonController : MonoBehaviour
 		public int playerId;
 		public int score;
 	}
+	public class HookData
+	{
+		public int playerId;
+		public HookType hookType;
+	}
+
 	public static event EventHandler<ScoreStruct> OnScoreAdded;
 	public static event EventHandler<int> OnPlayerKilled;
 	public static event EventHandler<int> OnPlayerNewLife;
+	public static event EventHandler<HookData> OnHookChanged;
 
 	[Header("Player")]
 	[Tooltip("Player Id")]
@@ -130,13 +137,16 @@ public class PangThirdPersonController : MonoBehaviour
 		isGamePaused = false;
 		_climbSpeed = 0.0f;
 		isShieldEnabled = false;
-		hookType = HookType.HOOK;
 		_shieldVisual = GetComponentInChildren<ShieldVisual>();
 	}
 
 	public void SetHookType(HookType hookType)
 	{
-		this.hookType = hookType;
+		if (hookType != this.hookType)
+		{
+			this.hookType = hookType;
+			OnHookChanged?.Invoke(this, new() { hookType = hookType, playerId = PlayerId });
+		}
 	}
 
 	public void ActivateShield()
@@ -199,6 +209,9 @@ public class PangThirdPersonController : MonoBehaviour
 
 		GameManager.OnPause += OnPause;
 		GameManager.OnUnpause += OnUnpause;
+
+		hookType = HookType.HOOK;
+		OnHookChanged?.Invoke(this, new() { hookType = hookType, playerId = PlayerId });
 	}
 
 	private void OnPause(object sender, EventArgs args)

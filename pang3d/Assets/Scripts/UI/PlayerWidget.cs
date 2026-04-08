@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using static PangThirdPersonController;
 
 public class PlayerWidget : MonoBehaviour
 {
@@ -10,12 +11,15 @@ public class PlayerWidget : MonoBehaviour
 	private TextMeshProUGUI ScoreText;
 	[SerializeField]
 	private TextMeshProUGUI LivesText;
+	[SerializeField]
+	private TextMeshProUGUI WeaponText;
 
 	private void OnEnable()
 	{
 		GameStats.OnPlayerDataChanged += OnPlayerDataChanged;
 		GameManager.OnPlayerStart += OnPlayerStart;
 		GameManager.OnGameEnded += OnGameEnded;
+		PangThirdPersonController.OnHookChanged += OnHookChanged;
 	}
 
 	private void OnDisable()
@@ -23,6 +27,22 @@ public class PlayerWidget : MonoBehaviour
 		GameStats.OnPlayerDataChanged -= OnPlayerDataChanged;
 		GameManager.OnPlayerStart -= OnPlayerStart;
 		GameManager.OnGameEnded -= OnGameEnded;
+		PangThirdPersonController.OnHookChanged -= OnHookChanged;
+	}
+
+	private void OnHookChanged(object sender, HookData data)
+	{
+		if (data.playerId == PlayerId)
+		{
+			WeaponText.text = data.hookType switch
+			{
+				PangHook.HookType.MACHINE_GUN => "Machine Gun",
+				PangHook.HookType.HOOK => "Hook",
+				PangHook.HookType.GRAPPLE => "Grapple",
+				_ => ""
+			}
+			;
+		}
 	}
 
 	private void OnGameEnded(object sender, GameManager.GameResultData gameResultData)
@@ -42,6 +62,7 @@ public class PlayerWidget : MonoBehaviour
 	{
 		ScoreText.text = "GAME OVER";
 		LivesText.text = "";
+		WeaponText.text = "";
 	}
 
 	private void OnPlayerStart(object sender, int playerId)
@@ -49,12 +70,7 @@ public class PlayerWidget : MonoBehaviour
 		var gameStats = FindAnyObjectByType<GameStats>();
 		OnPlayerDataChanged(null, gameStats.GetPlayerData(playerId));
 	}
-	/*
-	public void InitializePlayer(int playerId)
-	{
-		;
-	}
-	*/
+	
 	private void OnPlayerDataChanged(object sender, PlayerDataDTO playerData)
 	{
 		if (playerData.GetPlayerId() == PlayerId)
