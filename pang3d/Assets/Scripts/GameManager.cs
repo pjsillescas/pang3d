@@ -9,11 +9,17 @@ public class GameManager : MonoBehaviour
 	private const float HOURGLASS_TIMEOUT_SECONDS = 10;
 
 	public enum GameResult { WON, LOST_LIFE, LOST_GAME };
+	public class GameResultData
+	{
+		public GameResult gameResult;
+		public int playerId;
+	}
 
 	public static event EventHandler OnGameStarted;
-	public static event EventHandler<GameResult> OnGameEnded;
+	public static event EventHandler<GameResultData> OnGameEnded;
 	public static event EventHandler OnPause;
 	public static event EventHandler OnUnpause;
+	public static event EventHandler<int> OnPlayerStart;
 
 	private List<PangBall> balls;
 	private bool isGamePaused;
@@ -50,9 +56,9 @@ public class GameManager : MonoBehaviour
 		Time.timeScale = 1;
 	}
 
-	private void OnGameEndedMethod(object sender, GameResult result)
+	private void OnGameEndedMethod(object sender, GameResultData resultData)
 	{
-		var resultString = result == GameResult.WON ? "you won!!" : "you lost";
+		var resultString = resultData.gameResult == GameResult.WON ? "you won!!" : "you lost";
 		Debug.Log($"Game finished: {resultString}");
 		Time.timeScale = 0;
 	}
@@ -104,7 +110,7 @@ public class GameManager : MonoBehaviour
 
 		if (balls.Count <= 0)
 		{
-			OnGameEnded?.Invoke(this, GameResult.WON);
+			OnGameEnded?.Invoke(this, new() { gameResult = GameResult.WON, playerId = 0 });
 		}
 	}
 
@@ -131,8 +137,17 @@ public class GameManager : MonoBehaviour
 		//var playerInits = FindAnyObjectByType<PlayerInits>();
 		var playerChoices = FindAnyObjectByType<PlayerChoices>();
 
-		playerChoices.TrySpawnPlayer1();
-		playerChoices.TrySpawnPlayer2();
+		var successPlayer1 = playerChoices.TrySpawnPlayer1();
+		if(successPlayer1)
+		{
+			OnPlayerStart?.Invoke(this, 1);
+		}
+
+		var successPlayer2 = playerChoices.TrySpawnPlayer2();
+		if (successPlayer2)
+		{
+			OnPlayerStart?.Invoke(this, 2);
+		}
 
 		yield return new WaitForSeconds(0.1f);
 
@@ -156,11 +171,11 @@ public class GameManager : MonoBehaviour
 			if (playerData.GetLives() < 1)
 			{
 				Debug.LogWarning("lives out!!");
-				OnGameEnded?.Invoke(this, GameResult.LOST_GAME);
+				OnGameEnded?.Invoke(this, new() { gameResult = GameResult.LOST_GAME, playerId = playerData.GetPlayerId() });
 			}
 			else
 			{
-				OnGameEnded?.Invoke(this, GameResult.LOST_LIFE);
+				OnGameEnded?.Invoke(this, new() { gameResult = GameResult.LOST_LIFE, playerId = playerData.GetPlayerId() });
 			}
 		}
 	}
@@ -168,7 +183,7 @@ public class GameManager : MonoBehaviour
 	private void OnTimeout(object sender, EventArgs args)
 	{
 		Debug.LogWarning("time out");
-		OnGameEnded?.Invoke(this, GameResult.LOST_LIFE);
+		OnGameEnded?.Invoke(this, new() { gameResult = GameResult.LOST_LIFE, playerId = 0 });
 	}
 
 	private const float CLOCK_TIMEOUT_SECONDS = 10;

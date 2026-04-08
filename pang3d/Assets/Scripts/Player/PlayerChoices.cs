@@ -45,21 +45,25 @@ public class PlayerChoices : MonoBehaviour
 		return playerInits;
 	}
 
-	public void TrySpawnPlayer1()
+	public bool TrySpawnPlayer1()
 	{
 		var playerInits = GetPlayerInits();
 		if (playerInits != null && Player1Prefab != null)
 		{
-			playerInits.SpawnPlayer(Player1Prefab, 1);
+			return playerInits.SpawnPlayer(Player1Prefab, 1) != null;
 		}
+
+		return false;
 	}
 
-	public void TrySpawnPlayer2()
+	public bool TrySpawnPlayer2()
 	{
 		var playerInits = GetPlayerInits();
 		if (playerInits != null && Player2Prefab != null)
 		{
-			playerInits.SpawnPlayer(Player2Prefab, 2);
+			return playerInits.SpawnPlayer(Player2Prefab, 2) != null;
 		}
+
+		return false;
 	}
 }

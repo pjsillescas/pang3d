@@ -39,13 +39,13 @@ public class EndGameWidget : MonoBehaviour
 		GameManager.OnGameEnded -= OnGameEnded;
 	}
 
-	private void OnGameEnded(object sender, GameManager.GameResult gameResult)
+	private void OnGameEnded(object sender, GameManager.GameResultData gameResultData)
 	{
 		Debug.Log($"endgamewidget {gameResult}");
-		this.gameResult = gameResult;
-		GameOverText.enabled = gameResult == GameManager.GameResult.LOST_GAME;
-		LifeLostText.enabled = gameResult == GameManager.GameResult.LOST_LIFE;
-		LevelCompletedText.enabled = gameResult == GameManager.GameResult.WON;
+		this.gameResult = gameResultData.gameResult;
+		GameOverText.enabled = gameResultData.gameResult == GameManager.GameResult.LOST_GAME;
+		LifeLostText.enabled = gameResultData.gameResult == GameManager.GameResult.LOST_LIFE;
+		LevelCompletedText.enabled = gameResultData.gameResult == GameManager.GameResult.WON;
 
 		inputManager.OnHook += OnGoToNextLevel;
 	}
