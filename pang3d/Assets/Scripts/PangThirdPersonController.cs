@@ -19,6 +19,7 @@ public class PangThirdPersonController : MonoBehaviour
 	public static event EventHandler<int> OnPlayerKilled;
 	public static event EventHandler<int> OnPlayerNewLife;
 	public static event EventHandler<HookData> OnHookChanged;
+	public static event EventHandler<PangThirdPersonController> OnHookLaunched;
 
 	[Header("Player")]
 	[Tooltip("Player Id")]
@@ -149,6 +150,8 @@ public class PangThirdPersonController : MonoBehaviour
 		}
 	}
 
+	public HookType GetHookType() => hookType;
+
 	public void ActivateShield()
 	{
 		isShieldEnabled = true;
@@ -249,18 +252,24 @@ public class PangThirdPersonController : MonoBehaviour
 			return;
 		}
 
+		
 		if (hookType == HookType.MACHINE_GUN)
 		{
+			OnHookLaunched?.Invoke(this, this);
 			Shoot();
 			return;
+
 		}
 
 		if (currentHooksShot < maxHooksToShoot && !isGamePaused)
 		{
+			OnHookLaunched?.Invoke(this, this);
 			currentHooksShot++;
 			Debug.Log("hook");
 			var hook = Instantiate(HookPrefab).GetComponent<PangHook>();
 			hook.Shoot(HookOrigin, hookType, OnHookDestroyed, PlayerId);
+
+			return;
 		}
 	}
 

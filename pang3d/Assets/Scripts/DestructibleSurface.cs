@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class DestructibleSurface : DestructibleObject
 {
+	public static event EventHandler<DestructibleSurface> OnSurfaceDestroyed;
+
 	[SerializeField]
 	private float ItemProbability = 0.7f;
 
@@ -14,6 +17,7 @@ public class DestructibleSurface : DestructibleObject
 			itemSpawner.TrySpawnRandomItem(ItemProbability, transform.position);
 		}
 
+		OnSurfaceDestroyed?.Invoke(this, this);
 		Destroy(gameObject, 0.1f);
 	}
 

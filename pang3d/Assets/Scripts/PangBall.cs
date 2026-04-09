@@ -11,8 +11,9 @@ public class PangBall : MonoBehaviour
 	public enum BallType { BALL1, BALL2, BALL3, BALL4 }
 	public enum BallDirection { LEFT, RIGHT }
 
-	public static event EventHandler<PangBall> OnBallSpawned;
 	public static event EventHandler<PangBall> OnBallDestroyed;
+	public static event EventHandler<PangBall> OnBallSpawned;
+	public static event EventHandler<PangBall> OnBallBounce;
 
 	[SerializeField]
 	private float ItemProbability = 0.3f;
@@ -233,6 +234,8 @@ public class PangBall : MonoBehaviour
 				return;
 			}
 			isBouncing = true;
+
+			OnBallBounce?.Invoke(this, this);
 
 			StartCoroutine(SetBounceForce());
 			transform.position = new Vector3(transform.position.x, transform.position.y + radius, transform.position.z);
