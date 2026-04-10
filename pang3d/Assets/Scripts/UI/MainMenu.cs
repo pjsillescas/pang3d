@@ -30,7 +30,10 @@ public class MainMenu : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		inputManager.OnHook -= ChooseCharacter;
+		if(inputManager != null)
+		{
+			inputManager.OnHook -= ChooseCharacter;
+		}
 	}
 	
 	private void StartGame()
@@ -42,8 +45,6 @@ public class MainMenu : MonoBehaviour
 	private void ChooseCharacter(object sender, int playerId)
 	{
 		titleWidget.Deactivate();
-		//characterSelectionWidget.AddCharacter(playerMalePrefab, "Male");
-		//characterSelectionWidget.AddCharacter(playerFemalePrefab, "Female");
 		characterSelectionWidget.OnCharacterSelected += OnCharacterSelected;
 		characterSelectionWidget.Activate();
 	}

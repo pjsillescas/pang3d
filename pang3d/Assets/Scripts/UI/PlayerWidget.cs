@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using static PangThirdPersonController;
@@ -53,7 +52,7 @@ public class PlayerWidget : MonoBehaviour
 		}
 	}
 
-	void Start()
+	void Awake()
 	{
 		SetGameOver();
 	}

@@ -51,7 +51,6 @@ public class GameManager : MonoBehaviour
 
 		GameStats.OnPlayerDataChanged -= OnPlayerDataChanged;
 		OnGameEnded -= OnGameEndedMethod;
-		//PangThirdPersonController.OnPlayerKilled -= OnPlayerKilled;
 
 		Time.timeScale = 1;
 	}
@@ -91,7 +90,6 @@ public class GameManager : MonoBehaviour
 	{
 		TrySetColor(ball);
 		balls.Add(ball);
-		Debug.Log("ball spawned");
 	}
 
 	private void OnBallDestroyed(object sender, PangBall ball)
@@ -125,7 +123,6 @@ public class GameManager : MonoBehaviour
 		timeWidget.OnTimeout += OnTimeout;
 		GameStats.OnPlayerDataChanged += OnPlayerDataChanged;
 		OnGameEnded += OnGameEndedMethod;
-		//PangThirdPersonController.OnPlayerKilled += OnPlayerKilled;
 
 		balls.ForEach(ball => TrySetColor(ball));
 
@@ -134,7 +131,6 @@ public class GameManager : MonoBehaviour
 
 	private IEnumerator StartGame()
 	{
-		//var playerInits = FindAnyObjectByType<PlayerInits>();
 		var playerChoices = FindAnyObjectByType<PlayerChoices>();
 
 		var successPlayer1 = playerChoices.TrySpawnPlayer1();
