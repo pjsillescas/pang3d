@@ -7,6 +7,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class PangBall : MonoBehaviour
 {
+	private const int NUM_FRAMES_STUCK_IN_COLLISION = 2;
+
 	public enum SpeedMode { SLOW, FAST }
 	public enum BallType { BALL1, BALL2, BALL3, BALL4 }
 	public enum BallDirection { LEFT, RIGHT }
@@ -41,8 +43,10 @@ public class PangBall : MonoBehaviour
 	private float deltaTimeFactor;
 	private SpeedMode speedMode;
 	private bool isHarmless;
-	bool isDestroying;
-	
+	private bool isDestroying;
+	private int numFramesInCollision;
+
+
 	public SpeedMode GetSpeedMode() => speedMode;
 	public void SetSpeedMode(SpeedMode speedMode)
 	{
@@ -187,7 +191,7 @@ public class PangBall : MonoBehaviour
 
 		// Horizontal movement
 		pos.x += direction * horizontalSpeed * time;
-
+		
 		// Vertical movement
 		if (useGravity)
 		{
@@ -197,7 +201,7 @@ public class PangBall : MonoBehaviour
 		pos.z = 0f;
 		transform.position = pos;
 	}
-
+	
 	void OnCollisionEnter(Collision collision)
 	{
 		if (isPaused || isBouncing)
@@ -205,6 +209,7 @@ public class PangBall : MonoBehaviour
 			return;
 		}
 
+		numFramesInCollision = 0;
 		if (collision.gameObject.TryGetComponent(out PangThirdPersonController controller) && !isHarmless)
 		{
 			var hasShield = controller.HasShield();
@@ -243,6 +248,17 @@ public class PangBall : MonoBehaviour
 		else
 		{
 			direction *= -1;
+		}
+	}
+
+	private void OnCollisionStay(Collision collision)
+	{
+		numFramesInCollision++;
+		if(numFramesInCollision > NUM_FRAMES_STUCK_IN_COLLISION)
+		{
+			// stuck vertically in front of a wall, change direction
+			direction *= -1;
+			numFramesInCollision = 0;
 		}
 	}
 
