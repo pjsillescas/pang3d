@@ -50,7 +50,7 @@ public class InputManager : MonoBehaviour
 		}
 		
 		// Player 2 move when ready
-		return input.Player.Move.ReadValue<Vector2>();
+		return input.Player2.Move.ReadValue<Vector2>();
 	}
 
 	// Update is called once per frame
@@ -65,20 +65,40 @@ public class InputManager : MonoBehaviour
 		{
 			OnMove?.Invoke(this, new() { playerId = 1, movement = GetMoveVector(1) });
 		}
+
+		if (input.Player2.Move.WasPressedThisFrame())
+		{
+			OnMove?.Invoke(this, new() { playerId = 2, movement = GetMoveVector(2) });
+		}
 		
 		if (input.Player.Shoot.WasPressedThisFrame())
 		{
 			OnShoot?.Invoke(this, 1);
 		}
 
+		if (input.Player2.Shoot.WasPressedThisFrame())
+		{
+			OnShoot?.Invoke(this, 2);
+		}
+		
 		if (input.Player.Hook.WasPressedThisFrame())
 		{
 			OnHook?.Invoke(this, 1);
 		}
 
+		if (input.Player2.Hook.WasPressedThisFrame())
+		{
+			OnHook?.Invoke(this, 2);
+		}
+		
 		if (input.Player.Sprint.WasPressedThisFrame())
 		{
 			OnSprintBegin?.Invoke(this, 1);
+		}
+
+		if (input.Player2.Sprint.WasPressedThisFrame())
+		{
+			OnSprintBegin?.Invoke(this, 2);
 		}
 
 		if (input.Player.Sprint.WasReleasedThisFrame())
@@ -86,7 +106,12 @@ public class InputManager : MonoBehaviour
 			OnSprintEnd?.Invoke(this, 1);
 		}
 
-		if (input.Player.Pause.WasReleasedThisFrame())
+		if (input.Player2.Sprint.WasReleasedThisFrame())
+		{
+			OnSprintEnd?.Invoke(this, 2);
+		}
+		
+		if (input.Player.Pause.WasReleasedThisFrame() || input.Player2.Pause.WasReleasedThisFrame())
 		{
 			gameManager.TogglePause();
 		}
