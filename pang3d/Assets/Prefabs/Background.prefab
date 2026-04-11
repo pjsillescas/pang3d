@@ -1363,6 +1363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestructibleSurface
   ItemProbability: 0.7
+  DestroyedSurfacePrefab: {fileID: 5733270309552934783, guid: eeb90df9fb7e7f546ad430df7907879a, type: 3}
 --- !u!1 &6402161015373212135
 GameObject:
   m_ObjectHideFlags: 0

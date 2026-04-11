@@ -7,6 +7,8 @@ public class DestructibleSurface : DestructibleObject
 
 	[SerializeField]
 	private float ItemProbability = 0.7f;
+	[SerializeField]
+	private GameObject DestroyedSurfacePrefab;
 
 	public override void DestroyObject(int _)
 	{
@@ -18,7 +20,10 @@ public class DestructibleSurface : DestructibleObject
 		}
 
 		OnSurfaceDestroyed?.Invoke(this, this);
-		Destroy(gameObject, 0.1f);
+
+		Instantiate(DestroyedSurfacePrefab, transform.position, transform.rotation);
+
+		Destroy(gameObject, 0.02f);
 	}
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
