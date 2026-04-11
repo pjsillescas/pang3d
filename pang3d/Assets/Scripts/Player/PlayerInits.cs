@@ -9,11 +9,13 @@ public class PlayerInits : MonoBehaviour
 
 	public PangThirdPersonController SpawnPlayer(GameObject playerPrefab, int playerId)
 	{
-		return SpawnPlayer(playerPrefab, playerId == 1 ? playerEntryPoint1 : playerEntryPoint2);
+		var controller = SpawnPlayer(playerPrefab, playerId == 1 ? playerEntryPoint1 : playerEntryPoint2);
+		controller.SetPlayerId(playerId);
+		return controller;
 	}
 
 	private PangThirdPersonController SpawnPlayer(GameObject playerPrefab, Transform spawnPoint)
 	{
-		return Instantiate(playerPrefab, spawnPoint).GetComponent<PangThirdPersonController>();
+		return Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation).GetComponent<PangThirdPersonController>();
 	}
 }

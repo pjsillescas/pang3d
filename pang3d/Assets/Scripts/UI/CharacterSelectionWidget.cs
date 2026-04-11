@@ -26,6 +26,8 @@ public class CharacterSelectionWidget : MonoBehaviour
 	private TextMeshProUGUI characterNameText;
 	[SerializeField]
 	private TextMeshProUGUI selectionTitleText;
+	[SerializeField]
+	private TextMeshProUGUI playerPressStartText;
 
 	[SerializeField]
 	private float rotationSpeed = 50f;
@@ -36,17 +38,22 @@ public class CharacterSelectionWidget : MonoBehaviour
 	private int currentIndex;
 	private GameObject currentCharacterInstance;
 	private bool isActive;
+	private bool isPlayerSelecting;
+	private bool isPlayerSelected;
 	private InputManager inputManager;
 
 	private void Awake()
 	{
 		currentIndex = 0;
 		isActive = false;
+		isPlayerSelecting = false;
+		isPlayerSelected = false;
 	}
 
 	private void Start()
 	{
 		selectionTitleText.text = $"Select character Player {PlayerId}";
+		playerPressStartText.text = $"Player {PlayerId} press start";
 		inputManager = FindAnyObjectByType<InputManager>();
 		inputManager.OnHook += OnSelectCharacter;
 		inputManager.OnMove += OnCharacterCarousel;
@@ -62,9 +69,27 @@ public class CharacterSelectionWidget : MonoBehaviour
 		HandleRotation();
 	}
 
+	public bool IsReady()
+	{
+		Debug.Log($"{PlayerId} active {isActive} selecting {isPlayerSelecting} selected {isPlayerSelected}");
+		return !isActive || !isPlayerSelecting || isPlayerSelecting && isPlayerSelected;
+	}
+
 	private void OnSelectCharacter(object sender, int playerId)
 	{
-		SelectCurrentCharacter();
+		if(playerId != PlayerId)
+		{
+			return;
+		}
+
+		if (isPlayerSelecting)
+		{
+			SelectCurrentCharacter();
+		}
+		else
+		{
+			Activate(playerId);
+		}
 	}
 
 	private void OnCharacterCarousel(object sender, InputManager.MoveData data)
@@ -122,13 +147,35 @@ public class CharacterSelectionWidget : MonoBehaviour
 		currentIndex = 0;
 	}
 
-	public void Activate()
+	public void Activate(int playerId)
 	{
+		if(isPlayerSelecting)
+		{
+			return;
+		}
+
 		gameObject.SetActive(true);
 		isActive = true;
-		if (characters.Count > 0)
+		
+		if (playerId == PlayerId)
 		{
-			ShowCurrentCharacter();
+			isPlayerSelecting = true;
+			if (characters.Count > 0)
+			{
+				ShowCurrentCharacter();
+			}
+
+			characterNameText.gameObject.SetActive(true);
+			selectionTitleText.gameObject.SetActive(true);
+
+			playerPressStartText.gameObject.SetActive(false);
+		}
+		else
+		{
+			playerPressStartText.gameObject.SetActive(true);
+			characterNameText.gameObject.SetActive(false);
+			selectionTitleText.gameObject.SetActive(false);
+			isPlayerSelecting = false;
 		}
 	}
 
@@ -166,7 +213,9 @@ public class CharacterSelectionWidget : MonoBehaviour
 		{
 			return;
 		}
-		
+
+		isPlayerSelected = true;
+		Debug.Log($"selected character for player {PlayerId}");
 		OnCharacterSelected?.Invoke(this, new() { playerId = PlayerId, character = characters[currentIndex] });
 	}
 

@@ -39,6 +39,6 @@ public class CharacterSelectionSetup : MonoBehaviour
             }
         }
 
-        widget.Activate();
+        widget.Activate(1);
     }
 }

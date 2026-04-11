@@ -126,6 +126,10 @@ public class PangThirdPersonController : MonoBehaviour
 	private ShieldVisual _shieldVisual;
 
 	public int GetPlayerId() => PlayerId;
+	public void SetPlayerId(int playerId)
+	{
+		PlayerId = playerId;
+	}
 
 	private void Awake()
 	{

@@ -135,14 +135,14 @@ public class PangBall : MonoBehaviour
 
 	public void SetFastMode()
 	{
-		Debug.Log("fast mode");
+		//Debug.Log("fast mode");
 		speedMode = SpeedMode.FAST;
 		deltaTimeFactor = 1.0f;
 	}
 
 	public void SetSlowMode()
 	{
-		Debug.Log("slow mode");
+		//Debug.Log("slow mode");
 		speedMode = SpeedMode.SLOW;
 		deltaTimeFactor = DeltatimeFactorSlow;
 	}

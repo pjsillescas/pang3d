@@ -8,9 +8,12 @@ public class MainMenu : MonoBehaviour
 {
 	[SerializeField]
 	private string FirstLevel = "Playground";
-
+	[SerializeField]
+	private CharacterSelectionWidget characterSelectionWidgetPlayer1;
+	[SerializeField]
+	private CharacterSelectionWidget characterSelectionWidgetPlayer2;
+	
 	private InputManager inputManager;
-	private CharacterSelectionWidget characterSelectionWidget;
 	private TitleWidget titleWidget;
 	private PlayerChoices playerChoices;
 
@@ -18,21 +21,25 @@ public class MainMenu : MonoBehaviour
 	void Start()
 	{
 		inputManager = GetComponent<InputManager>();
-		characterSelectionWidget = FindAnyObjectByType<CharacterSelectionWidget>();
+		//characterSelectionWidgetPlayer1 = FindAnyObjectByType<CharacterSelectionWidget>();
 		titleWidget = FindAnyObjectByType<TitleWidget>();
 		playerChoices = FindAnyObjectByType<PlayerChoices>();
 
 		titleWidget.Activate();
-		characterSelectionWidget.Deactivate();
+		characterSelectionWidgetPlayer1.Deactivate();
+		characterSelectionWidgetPlayer2.Deactivate();
+		
+		characterSelectionWidgetPlayer1.OnCharacterSelected += OnCharacterSelected;
+		characterSelectionWidgetPlayer2.OnCharacterSelected += OnCharacterSelected;
 
-		inputManager.OnHook += ChooseCharacter;
+		inputManager.OnHook += SelectCharacter;
 	}
 
 	private void OnDestroy()
 	{
 		if(inputManager != null)
 		{
-			inputManager.OnHook -= ChooseCharacter;
+			inputManager.OnHook -= SelectCharacter;
 		}
 	}
 	
@@ -42,17 +49,26 @@ public class MainMenu : MonoBehaviour
 		SceneManager.LoadScene(FirstLevel);
 	}
 
-	private void ChooseCharacter(object sender, int playerId)
+	private void SelectCharacter(object sender, int playerId)
 	{
 		titleWidget.Deactivate();
-		characterSelectionWidget.OnCharacterSelected += OnCharacterSelected;
-		characterSelectionWidget.Activate();
+
+		characterSelectionWidgetPlayer1.Activate(playerId);
+		characterSelectionWidgetPlayer2.Activate(playerId);
 	}
 
 	private void OnCharacterSelected(object sender, SelectedCharacterData characterData) {
 		Debug.Log($"Selected: {characterData.character.CharacterName}");
 		playerChoices.SetPlayerCharacter(characterData.playerId, characterData.character);
 
-		StartGame();
+		CheckForStartGame();
+	}
+
+	private void CheckForStartGame()
+	{
+		if (characterSelectionWidgetPlayer1.IsReady() && characterSelectionWidgetPlayer2.IsReady())
+		{
+			StartGame();
+		}
 	}
 }

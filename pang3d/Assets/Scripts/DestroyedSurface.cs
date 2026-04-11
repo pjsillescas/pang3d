@@ -1,7 +1,5 @@
-using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.Layouts;
 
 public class DestroyedSurface : MonoBehaviour
 {
@@ -35,7 +33,7 @@ public class DestroyedSurface : MonoBehaviour
 		rigidBodies.ForEach(rb =>
 		{
 			rb.AddExplosionForce(force, position, radius);
-			Destroy(rb.gameObject, 1f);
+			Destroy(rb.gameObject, destroyTimeoutSeconds);
 		});
 	}
 }

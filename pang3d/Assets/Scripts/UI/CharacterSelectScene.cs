@@ -23,7 +23,7 @@ public class CharacterSelectScene : MonoBehaviour
 			Characters.ForEach(data => selectionWidget.AddCharacter(data.CharacterPrefab, data.CharacterName));
 
 			selectionWidget.OnCharacterSelected += OnCharacterSelected;
-			selectionWidget.Activate();
+			selectionWidget.Activate(1);
 		}
 	}
 
