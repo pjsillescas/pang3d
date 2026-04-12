@@ -113,7 +113,10 @@ public class InputManager : MonoBehaviour
 		
 		if (input.Player.Pause.WasReleasedThisFrame() || input.Player2.Pause.WasReleasedThisFrame())
 		{
-			gameManager.TogglePause();
+			if (gameManager != null)
+			{
+				gameManager.TogglePause();
+			}
 		}
 
 	}
