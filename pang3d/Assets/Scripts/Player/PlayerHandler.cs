@@ -50,4 +50,10 @@ public class PlayerHandler
 
 		return controller;
 	}
+
+	public void DestroyCharacter()
+	{
+		GameObject.Destroy(controller.gameObject, 0.1f);
+		controller = null;
+	}
 }

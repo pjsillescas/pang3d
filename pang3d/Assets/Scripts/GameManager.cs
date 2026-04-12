@@ -85,13 +85,29 @@ public class GameManager : MonoBehaviour
 		}
 		else
 		{
-			if (resultData.playerId == 1)
+			var stats = FindAnyObjectByType<GameStats>();
+			if (stats.GetPlayerData(resultData.playerId).GetLives() > 0)
 			{
-				SpawnPlayer1();
+				if (resultData.playerId == 1)
+				{
+					SpawnPlayer1();
+				}
+				else
+				{
+					SpawnPlayer2();
+				}
 			}
 			else
 			{
-				SpawnPlayer2();
+				if (resultData.playerId == 1)
+				{
+					playerHandler1.DestroyCharacter();
+				}
+				else
+				{
+					playerHandler2.DestroyCharacter();
+				}
+
 			}
 		}
 	}

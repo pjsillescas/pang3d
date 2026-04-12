@@ -21,7 +21,6 @@ public class MainMenu : MonoBehaviour
 	void Start()
 	{
 		inputManager = GetComponent<InputManager>();
-		//characterSelectionWidgetPlayer1 = FindAnyObjectByType<CharacterSelectionWidget>();
 		titleWidget = FindAnyObjectByType<TitleWidget>();
 		playerChoices = FindAnyObjectByType<PlayerChoices>();
 
@@ -68,6 +67,7 @@ public class MainMenu : MonoBehaviour
 	{
 		if (characterSelectionWidgetPlayer1.IsReady() && characterSelectionWidgetPlayer2.IsReady())
 		{
+			//Debug.Log("start game");
 			StartGame();
 		}
 	}

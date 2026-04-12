@@ -186,7 +186,6 @@ public class PangThirdPersonController : MonoBehaviour
 
 	public void ActivateStairs()
 	{
-		//Debug.Log("stairs on");
 		isInStairs = true;
 
 		if (_hasAnimator)
@@ -198,7 +197,6 @@ public class PangThirdPersonController : MonoBehaviour
 
 	public void DeactivateStairs()
 	{
-		//Debug.Log("stairs off");
 		isInStairs = false;
 		if (_hasAnimator)
 		{
@@ -208,7 +206,6 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void Start()
 	{
-		Debug.Log("start");
 		_hasAnimator = TryGetComponent(out _animator);
 		inputManager = FindAnyObjectByType<InputManager>();
 

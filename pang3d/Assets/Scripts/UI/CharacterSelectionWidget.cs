@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class CharacterSelectionWidget : MonoBehaviour
 {
+	private enum TSelectionStatus { INACTIVE, SELECTING, SELECTED }
 	public class SelectedCharacterData
 	{
 		public int playerId;
@@ -37,17 +39,13 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	private int currentIndex;
 	private GameObject currentCharacterInstance;
-	private bool isActive;
-	private bool isPlayerSelecting;
-	private bool isPlayerSelected;
+	private TSelectionStatus selectionStatus;
 	private InputManager inputManager;
 
 	private void Awake()
 	{
 		currentIndex = 0;
-		isActive = false;
-		isPlayerSelecting = false;
-		isPlayerSelected = false;
+		selectionStatus = TSelectionStatus.INACTIVE;
 	}
 
 	private void Start()
@@ -61,7 +59,7 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	void Update()
 	{
-		if (!isActive)
+		if(selectionStatus == TSelectionStatus.INACTIVE)
 		{
 			return;
 		}
@@ -71,24 +69,33 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	public bool IsReady()
 	{
-		Debug.Log($"{PlayerId} active {isActive} selecting {isPlayerSelecting} selected {isPlayerSelected}");
-		return !isActive || !isPlayerSelecting || isPlayerSelecting && isPlayerSelected;
+		//Debug.Log($"{PlayerId} active {isActive} selecting {isPlayerSelecting} selected {isPlayerSelected}");
+		//return !isPlayerSelecting || isPlayerSelected;
+		Debug.Log($"player {PlayerId} status = {selectionStatus}");
+		return selectionStatus == TSelectionStatus.SELECTED;
 	}
 
 	private void OnSelectCharacter(object sender, int playerId)
 	{
-		if(playerId != PlayerId)
+		Debug.Log($"onselect character {playerId} {selectionStatus}");
+		
+		if (playerId != PlayerId)
 		{
 			return;
 		}
 
-		if (isPlayerSelecting)
+		//if (isPlayerSelecting)
+		if(selectionStatus == TSelectionStatus.SELECTING)
 		{
 			SelectCurrentCharacter();
 		}
-		else
+		else if (selectionStatus == TSelectionStatus.INACTIVE)
 		{
 			Activate(playerId);
+		}
+		else
+		{
+			Debug.Log($"");
 		}
 	}
 
@@ -149,17 +156,19 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	public void Activate(int playerId)
 	{
-		if(isPlayerSelecting)
+		//if(isPlayerSelecting)
+		if(playerId != PlayerId || selectionStatus == TSelectionStatus.SELECTING)
 		{
 			return;
 		}
 
 		gameObject.SetActive(true);
-		isActive = true;
+		//isActive = true;
 		
 		if (playerId == PlayerId)
 		{
-			isPlayerSelecting = true;
+			selectionStatus = TSelectionStatus.SELECTING;
+			//isPlayerSelecting = true;
 			if (characters.Count > 0)
 			{
 				ShowCurrentCharacter();
@@ -175,14 +184,16 @@ public class CharacterSelectionWidget : MonoBehaviour
 			playerPressStartText.gameObject.SetActive(true);
 			characterNameText.gameObject.SetActive(false);
 			selectionTitleText.gameObject.SetActive(false);
-			isPlayerSelecting = false;
+			//isPlayerSelecting = false;
+			selectionStatus = TSelectionStatus.SELECTING;
 		}
 	}
 
 	public void Deactivate()
 	{
 		gameObject.SetActive(false);
-		isActive = false;
+		//isActive = false;
+		selectionStatus = TSelectionStatus.INACTIVE;
 	}
 
 	public void NextCharacter()
@@ -214,7 +225,9 @@ public class CharacterSelectionWidget : MonoBehaviour
 			return;
 		}
 
-		isPlayerSelected = true;
+		//isPlayerSelected = true;
+		selectionStatus = TSelectionStatus.SELECTED;
+
 		Debug.Log($"selected character for player {PlayerId}");
 		OnCharacterSelected?.Invoke(this, new() { playerId = PlayerId, character = characters[currentIndex] });
 	}
