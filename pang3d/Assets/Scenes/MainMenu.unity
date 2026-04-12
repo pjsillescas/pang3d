@@ -1839,7 +1839,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2f83780f264f5a4ca7f576efac0b1a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerChoices
-  Player1Prefab: {fileID: 4610580919671336548, guid: 8268d5b85d611b046a72dc8c25f955a9, type: 3}
+  Player1Prefab: {fileID: 0}
   Player2Prefab: {fileID: 0}
 --- !u!4 &1102353730
 Transform:
