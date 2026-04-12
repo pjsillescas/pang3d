@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ShieldVisual : MonoBehaviour
@@ -22,6 +23,8 @@ public class ShieldVisual : MonoBehaviour
 	private Vector3 yOffset = new(0, 0.5f, 0);
 	[SerializeField]
 	private Material PlasmaMaterial;
+	[SerializeField]
+	private GameObject ShieldSphere;
 
 	private GameObject capsuleObject;
 	private MeshFilter meshFilter;
@@ -32,6 +35,7 @@ public class ShieldVisual : MonoBehaviour
 
 	private void Awake()
 	{
+		/*
 		capsuleObject = new GameObject("ShieldCapsule");
 		capsuleObject.transform.SetParent(transform);
 		capsuleObject.transform.SetLocalPositionAndRotation(yOffset, Quaternion.identity);
@@ -48,13 +52,13 @@ public class ShieldVisual : MonoBehaviour
 		meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		meshRenderer.receiveShadows = false;
 
-		/*
+		/ *
 		Shader shader = Shader.Find("Custom/PlasmaShield");
 		if (shader == null)
 		{
 			shader = Shader.Find("Standard");
 		}
-		*/
+		* /
 
 
 		//plasmaMaterial = new Material(shader);
@@ -74,6 +78,8 @@ public class ShieldVisual : MonoBehaviour
 
 		meshRenderer.material = plasmaMaterial;
 		capsuleObject.SetActive(false);
+		*/
+		ShieldSphere.gameObject.SetActive(false);
 	}
 
 	private Mesh CreateCapsuleMesh(float radius, float height)
@@ -198,22 +204,28 @@ public class ShieldVisual : MonoBehaviour
 
 		isActive = true;
 		activationTime = Time.time;
-		capsuleObject.SetActive(true);
-		plasmaMaterial.SetFloat("_Activation", 0.01f);
+		//capsuleObject.SetActive(true);
+		//plasmaMaterial.SetFloat("_Activation", 0.01f);
+
+		ShieldSphere.gameObject.SetActive(true);
 	}
 
 	public void Deactivate()
 	{
 		isActive = false;
+		/*
 		capsuleObject.SetActive(false);
 		if (plasmaMaterial != null)
 		{
 			plasmaMaterial.SetFloat("_Activation", 0f);
 		}
+		*/
+		ShieldSphere.gameObject.SetActive(false);
 	}
 
 	private void Update()
 	{
+		/*
 		if (!isActive || plasmaMaterial == null) return;
 
 		float elapsed = Time.time - activationTime;
@@ -223,6 +235,7 @@ public class ShieldVisual : MonoBehaviour
 
 		float pulse = 1f + Mathf.Sin(elapsed * pulseSpeed) * 0.05f;
 		capsuleObject.transform.localScale = new Vector3(pulse, 1f, pulse);
+		*/
 	}
 
 	public bool IsActive => isActive;
