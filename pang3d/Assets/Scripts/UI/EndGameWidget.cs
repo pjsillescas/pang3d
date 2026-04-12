@@ -57,8 +57,10 @@ public class EndGameWidget : MonoBehaviour
 			
 			inputManager.OnHook += OnGoToNextLevel;
 		}
-		else
+		else if (gameResultData.gameResult == GameManager.GameResult.WON)
 		{
+			LevelCompletedText.enabled = true;
+			inputManager.OnHook += OnGoToNextLevel;
 			//inputManager.OnHook += Revive;
 		}
 

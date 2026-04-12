@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class CharacterSelectionWidget : MonoBehaviour
@@ -69,10 +68,8 @@ public class CharacterSelectionWidget : MonoBehaviour
 
 	public bool IsReady()
 	{
-		//Debug.Log($"{PlayerId} active {isActive} selecting {isPlayerSelecting} selected {isPlayerSelected}");
-		//return !isPlayerSelecting || isPlayerSelected;
 		Debug.Log($"player {PlayerId} status = {selectionStatus}");
-		return selectionStatus == TSelectionStatus.SELECTED;
+		return selectionStatus == TSelectionStatus.INACTIVE || selectionStatus == TSelectionStatus.SELECTED;
 	}
 
 	private void OnSelectCharacter(object sender, int playerId)
@@ -84,7 +81,6 @@ public class CharacterSelectionWidget : MonoBehaviour
 			return;
 		}
 
-		//if (isPlayerSelecting)
 		if(selectionStatus == TSelectionStatus.SELECTING)
 		{
 			SelectCurrentCharacter();
