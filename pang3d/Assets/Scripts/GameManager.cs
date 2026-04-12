@@ -25,9 +25,12 @@ public class GameManager : MonoBehaviour
 	private bool isGamePaused;
 	private TimeWidget timeWidget;
 	private LevelInfoWidget levelInfoWidget;
+	private PlayerChoices playerChoices;
+	private PlayerHandler playerHandler1;
+	private PlayerHandler playerHandler2;
 
 	public List<PangBall> GetBalls() => balls;
-
+	
 	private void Awake()
 	{
 		balls = new();
@@ -55,11 +58,42 @@ public class GameManager : MonoBehaviour
 		Time.timeScale = 1;
 	}
 
+	public bool AreThereTwoPlayers()
+	{
+		var playersData = FindAnyObjectByType<PlayerChoices>();
+
+		return playersData.GetNumberOfPlayers() == 2;
+	}
+
+	public bool IsGameOver()
+	{
+		var playersData = FindAnyObjectByType<PlayerChoices>();
+		var stats = FindAnyObjectByType<GameStats>();
+		var data1 = stats.GetPlayerData(1);
+		var data2 = stats.GetPlayerData(2);
+		return (playersData.GetPlayer1Prefab() == null || data1.GetLives() == 0) && (playersData.GetPlayer2Prefab() == null || data2.GetLives() == 0);
+	}
+
 	private void OnGameEndedMethod(object sender, GameResultData resultData)
 	{
 		var resultString = resultData.gameResult == GameResult.WON ? "you won!!" : "you lost";
 		Debug.Log($"Game finished: {resultString}");
-		Time.timeScale = 0;
+
+		if (IsGameOver())
+		{
+			Time.timeScale = 0;
+		}
+		else
+		{
+			if (resultData.playerId == 1)
+			{
+				SpawnPlayer1();
+			}
+			else
+			{
+				SpawnPlayer2();
+			}
+		}
 	}
 
 	public void TogglePause()
@@ -117,6 +151,7 @@ public class GameManager : MonoBehaviour
 	{
 		OnGameStarted?.Invoke(this, EventArgs.Empty);
 		timeWidget = FindAnyObjectByType<TimeWidget>();
+		playerChoices = FindAnyObjectByType<PlayerChoices>();
 
 		levelInfoWidget = FindAnyObjectByType<LevelInfoWidget>();
 		timeWidget.StartTimer(levelInfoWidget.GetLevelData().Time);
@@ -129,22 +164,61 @@ public class GameManager : MonoBehaviour
 		StartCoroutine(StartGame());
 	}
 
-	private IEnumerator StartGame()
+	private PlayerHandler GetPlayerHandler1()
 	{
-		var playerChoices = FindAnyObjectByType<PlayerChoices>();
+		if (playerHandler1 == null)
+		{
+			var spawnPoint = FindAnyObjectByType<PlayerInits>().GetPlayerInitPoint(1);
+			var playerPrefab = playerChoices.GetPlayer1Prefab();
+			playerHandler1 = new PlayerHandler(spawnPoint, playerPrefab, 1);
+		}
 
-		var successPlayer1 = playerChoices.TrySpawnPlayer1();
-		if(successPlayer1)
+		return playerHandler1;
+	}
+
+	private PlayerHandler GetPlayerHandler2()
+	{
+		if (playerHandler2 == null)
+		{
+			var spawnPoint = FindAnyObjectByType<PlayerInits>().GetPlayerInitPoint(2);
+			var playerPrefab = playerChoices.GetPlayer2Prefab();
+			playerHandler2 = new PlayerHandler(spawnPoint, playerPrefab, 2);
+		}
+
+		return playerHandler2;
+	}
+	
+	public PangThirdPersonController SpawnPlayer1()
+	{
+		//var controller = playerChoices.TrySpawnPlayer1();
+		var controller = GetPlayerHandler1().TrySpawnPlayer();
+		if (controller != null)
 		{
 			OnPlayerStart?.Invoke(this, 1);
 		}
 
-		var successPlayer2 = playerChoices.TrySpawnPlayer2();
-		if (successPlayer2)
+		return controller;
+	}
+
+	public PangThirdPersonController SpawnPlayer2()
+	{
+		//var controller = playerChoices.TrySpawnPlayer2();
+		var controller = GetPlayerHandler2().TrySpawnPlayer();
+		if (controller != null)
 		{
 			OnPlayerStart?.Invoke(this, 2);
 		}
 
+		return controller;
+	}
+
+	private IEnumerator StartGame()
+	{
+		playerChoices = FindAnyObjectByType<PlayerChoices>();
+
+		SpawnPlayer1();
+		SpawnPlayer2();
+		
 		yield return new WaitForSeconds(0.1f);
 
 		var initGameWidget = FindAnyObjectByType<InitGameWidget>();

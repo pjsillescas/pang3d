@@ -1,9 +1,12 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using static PangHook;
 
 public class PangThirdPersonController : MonoBehaviour
 {
+	private const float INVULNERABILITY_TIME_SECONDS = 2f;
+
 	public struct ScoreStruct
 	{
 		public int playerId;
@@ -124,6 +127,7 @@ public class PangThirdPersonController : MonoBehaviour
 	private bool isShieldEnabled;
 	private HookType hookType;
 	private ShieldVisual _shieldVisual;
+	private bool isInvulnerable;
 
 	public int GetPlayerId() => PlayerId;
 	public void SetPlayerId(int playerId)
@@ -143,6 +147,7 @@ public class PangThirdPersonController : MonoBehaviour
 		_climbSpeed = 0.0f;
 		isShieldEnabled = false;
 		_shieldVisual = GetComponentInChildren<ShieldVisual>();
+		isInvulnerable = true;
 	}
 
 	public void SetHookType(HookType hookType)
@@ -219,6 +224,15 @@ public class PangThirdPersonController : MonoBehaviour
 
 		hookType = HookType.HOOK;
 		OnHookChanged?.Invoke(this, new() { hookType = hookType, playerId = PlayerId });
+
+		StartCoroutine(DisableInvulnerabilityCoroutine());
+	}
+
+	private IEnumerator DisableInvulnerabilityCoroutine()
+	{
+		yield return new WaitForSeconds(INVULNERABILITY_TIME_SECONDS);
+
+		isInvulnerable = false;
 	}
 
 	private void OnPause(object sender, EventArgs args)
@@ -510,6 +524,11 @@ public class PangThirdPersonController : MonoBehaviour
 
 	public void KillCharacter()
 	{
+		if(isInvulnerable)
+		{
+			return;
+		}
+
 		if (isShieldEnabled)
 		{
 			Debug.Log("using shield");

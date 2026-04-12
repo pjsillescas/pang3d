@@ -16,6 +16,7 @@ public class EndGameWidget : MonoBehaviour
 	private InputManager inputManager;
 	private LevelInfoWidget levelInfoWidget;
 	private GameManager.GameResult gameResult;
+	private GameManager gameManager;
 
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
@@ -25,6 +26,7 @@ public class EndGameWidget : MonoBehaviour
 		LifeLostText.enabled = false;
 		levelInfoWidget = FindAnyObjectByType<LevelInfoWidget>();
 		inputManager = FindAnyObjectByType<InputManager>();
+		gameManager = FindAnyObjectByType<GameManager>();
 
 		inputManager.OnHook -= OnGoToNextLevel;
 	}
@@ -41,13 +43,22 @@ public class EndGameWidget : MonoBehaviour
 
 	private void OnGameEnded(object sender, GameManager.GameResultData gameResultData)
 	{
-		Debug.Log($"endgamewidget {gameResult}");
-		this.gameResult = gameResultData.gameResult;
-		GameOverText.enabled = gameResultData.gameResult == GameManager.GameResult.LOST_GAME;
-		LifeLostText.enabled = gameResultData.gameResult == GameManager.GameResult.LOST_LIFE;
-		LevelCompletedText.enabled = gameResultData.gameResult == GameManager.GameResult.WON;
+		//var gameManager = FindAnyObjectByType<GameManager>();
+		if (gameManager.IsGameOver())
+		{
+			Debug.Log($"endgamewidget {gameResult}");
+			this.gameResult = gameResultData.gameResult;
+			GameOverText.enabled = gameResultData.gameResult == GameManager.GameResult.LOST_GAME;
+			LifeLostText.enabled = gameResultData.gameResult == GameManager.GameResult.LOST_LIFE;
+			LevelCompletedText.enabled = gameResultData.gameResult == GameManager.GameResult.WON;
+			
+			inputManager.OnHook += OnGoToNextLevel;
+		}
+		else
+		{
+			inputManager.OnHook += Revive;
+		}
 
-		inputManager.OnHook += OnGoToNextLevel;
 	}
 
 	private void OnGoToNextLevel(object sender, int playerId)
@@ -78,4 +89,18 @@ public class EndGameWidget : MonoBehaviour
 
 		SceneManager.LoadScene(nextLevel);
 	}
+
+	private void Revive(object sender, int playerId)
+	{
+		//var gameManager = FindAnyObjectByType<GameManager>();
+		if (playerId == 1)
+		{
+			gameManager.SpawnPlayer1();
+		}
+		else
+		{
+			gameManager.SpawnPlayer2();
+		}
+	}
+
 }

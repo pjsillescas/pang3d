@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerChoices : MonoBehaviour
@@ -15,13 +17,22 @@ public class PlayerChoices : MonoBehaviour
 		DontDestroyOnLoad(this);
 
 		playerInits = null;
-		//TrySpawnPlayer1();
-		//TrySpawnPlayer2();
+	}
+
+	public int GetNumberOfPlayers()
+	{
+		/*
+		var player1 = Player1Prefab != null ? 1 : 0;
+		var player2 = Player2Prefab != null ? 1 : 0;
+
+		return player1 + player2;
+		*/
+		return (new List<GameObject>() { Player1Prefab, Player2Prefab }).Count(prefab => prefab != null);
 	}
 
 	public void SetPlayerCharacter(int playerId, PlayerCharacterSO character)
 	{
-		if(playerId == 1)
+		if (playerId == 1)
 		{
 			Player1Prefab = character.CharacterPrefab;
 		}
@@ -45,25 +56,6 @@ public class PlayerChoices : MonoBehaviour
 		return playerInits;
 	}
 
-	public bool TrySpawnPlayer1()
-	{
-		var playerInits = GetPlayerInits();
-		if (playerInits != null && Player1Prefab != null)
-		{
-			return playerInits.SpawnPlayer(Player1Prefab, 1) != null;
-		}
-
-		return false;
-	}
-
-	public bool TrySpawnPlayer2()
-	{
-		var playerInits = GetPlayerInits();
-		if (playerInits != null && Player2Prefab != null)
-		{
-			return playerInits.SpawnPlayer(Player2Prefab, 2) != null;
-		}
-
-		return false;
-	}
+	public GameObject GetPlayer1Prefab() => Player1Prefab;
+	public GameObject GetPlayer2Prefab() => Player2Prefab;
 }
