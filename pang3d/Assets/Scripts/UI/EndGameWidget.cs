@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class EndGameWidget : MonoBehaviour
 {
+	private enum HookType {  }
 	[SerializeField]
 	private TextMeshProUGUI GameOverText;
 
@@ -39,6 +40,8 @@ public class EndGameWidget : MonoBehaviour
 	private void OnDisable()
 	{
 		GameManager.OnGameEnded -= OnGameEnded;
+		
+		inputManager.OnHook -= OnGoToNextLevel;
 	}
 
 	private void OnGameEnded(object sender, GameManager.GameResultData gameResultData)
@@ -56,7 +59,7 @@ public class EndGameWidget : MonoBehaviour
 		}
 		else
 		{
-			inputManager.OnHook += Revive;
+			//inputManager.OnHook += Revive;
 		}
 
 	}
@@ -92,6 +95,7 @@ public class EndGameWidget : MonoBehaviour
 
 	private void Revive(object sender, int playerId)
 	{
+		Debug.Log($"revive {playerId}");
 		//var gameManager = FindAnyObjectByType<GameManager>();
 		if (playerId == 1)
 		{
