@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 792ccc209e5837747aafd1542ff3cedb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
-  FirstLevel: Level1
+  FirstLevel: Level3
   characterSelectionWidgetPlayer1: {fileID: 1389881563}
   characterSelectionWidgetPlayer2: {fileID: 2021030246}
 --- !u!1 &61264582
@@ -1443,7 +1443,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 737865664259085656, guid: dbc3d68216b29fe42a7895fcb8ca9b59, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -11.691343
+      value: -11.699137
       objectReference: {fileID: 0}
     - target: {fileID: 3025698619261240552, guid: dbc3d68216b29fe42a7895fcb8ca9b59, type: 3}
       propertyPath: m_Name
@@ -5178,9 +5178,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0.10010061
+    y: 0.0995
     width: 1
-    height: 0.7997988
+    height: 0.801
   near clip plane: 0.2
   far clip plane: 500
   field of view: 60.000004
@@ -5210,7 +5210,7 @@ Transform:
   m_GameObject: {fileID: 8944336656349189697}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.5, y: 3.85, z: -11.691343}
+  m_LocalPosition: {x: 4.5, y: 3.85, z: -11.699137}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

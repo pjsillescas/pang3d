@@ -6,7 +6,7 @@ public class Missile : MonoBehaviour
 	private float Speed = 20.0f;
 
 	[SerializeField]
-	private float maxDistance = 10.0f;
+	private float maxDistance = 20.0f;
 
 	private Vector3 origin;
 	private int playerId;
