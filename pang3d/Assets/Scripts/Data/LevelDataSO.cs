@@ -7,4 +7,5 @@ public class LevelDataSO : ScriptableObject
 	public string NextLevelName = "NextLevel";
 	public int Time = 200;
 	public Color LevelColor = Color.blue;
+	public AudioClip MusicClip = null;
 }

@@ -16,3 +16,4 @@ MonoBehaviour:
   NextLevelName: MainMenu
   Time: 300
   LevelColor: {r: 0.5183081, g: 0.84276724, b: 0.28357258, a: 1}
+  MusicClip: {fileID: 8300000, guid: c9bcf2e766b602a4dba65585a413e1c8, type: 3}

@@ -16,3 +16,4 @@ MonoBehaviour:
   NextLevelName: Level2
   Time: 300
   LevelColor: {r: 0.29735753, g: 0.82596886, b: 0.9748427, a: 1}
+  MusicClip: {fileID: 8300000, guid: c9bcf2e766b602a4dba65585a413e1c8, type: 3}
