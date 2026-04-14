@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -215,7 +214,7 @@ public class PangBall : MonoBehaviour
 			var hasShield = controller.HasShield();
 			controller.KillCharacter();
 
-			if(hasShield)
+			//if(hasShield)
 			{
 				DestroyBall(controller.GetPlayerId());
 			}
@@ -231,9 +230,19 @@ public class PangBall : MonoBehaviour
 		ContactPoint contact = collision.contacts[0];
 		Vector3 normal = contact.normal;
 
+		var dotProduct = Vector3.Dot(normal, Vector3.up);
+
 		// Floor check
-		if (Vector3.Dot(normal, Vector3.up) > 0.7f || collision.gameObject.CompareTag("Ground"))
+		if (dotProduct < 0f)
 		{
+			// surface above the ball, bounce downwards
+			OnBallBounce?.Invoke(this, this);
+
+			verticalVelocity = 0f;
+		}
+		else if (dotProduct > 0.7f || collision.gameObject.CompareTag("Ground"))
+		{
+			// surface below the ball, bounce upwards
 			if (isBouncing)
 			{
 				return;
@@ -242,10 +251,10 @@ public class PangBall : MonoBehaviour
 
 			OnBallBounce?.Invoke(this, this);
 
-			StartCoroutine(SetBounceForce());
+			StartCoroutine(SetBounceForce(1));
 			transform.position = new Vector3(transform.position.x, transform.position.y + radius, transform.position.z);
 		}
-		else
+		else 
 		{
 			direction *= -1;
 		}
@@ -262,11 +271,13 @@ public class PangBall : MonoBehaviour
 		}
 	}
 
-	private IEnumerator SetBounceForce()
+	private IEnumerator SetBounceForce(float direction)
 	{
 		const int FRAMES_PER_BOUNCE = 4;
 		//float deltaVelocity = bounceForce / FRAMES_PER_BOUNCE;
-		float deltaVelocity = bounceForce * 8f / 15f;
+
+		float thisBounceForce = direction > 0 ? bounceForce : bounceForce / 16f;
+		float deltaVelocity = direction * thisBounceForce * 8f / 15f;
 		//Debug.Log($"force {bounceForce} ({deltaVelocity})");
 
 		useGravity = false;

@@ -5,7 +5,7 @@ using static PangHook;
 
 public class PangThirdPersonController : MonoBehaviour
 {
-	private const float INVULNERABILITY_TIME_SECONDS = 2f;
+	private const float INVULNERABILITY_TIME_SECONDS = 5f;
 
 	public struct ScoreStruct
 	{

@@ -20,7 +20,10 @@ public class GameOverWatcher : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		inputManager.OnHook -= OnStartNewContinue;
+		if(inputManager != null)
+		{
+			inputManager.OnHook -= OnStartNewContinue;
+		}
 	}
 
 	private bool PlayerCanStartNewGame(int playerId)
