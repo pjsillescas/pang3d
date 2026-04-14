@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea2596ce6e85d1e429bf71502f50e8f5, type: 3}
-  m_Name: Level2
+  m_Name: Level10
   m_EditorClassIdentifier: Assembly-CSharp::LevelDataSO
-  LevelName: Level2
-  NextLevelName: Level3
+  LevelName: Level10
+  NextLevelName: MainMenu
   Time: 300
-  LevelColor: {r: 0.5183081, g: 0.84276724, b: 0.28357258, a: 1}
+  LevelColor: {r: 0.5660378, g: 0.34471187, b: 0.06229969, a: 1}
   MusicClip: {fileID: 8300000, guid: c9bcf2e766b602a4dba65585a413e1c8, type: 3}
