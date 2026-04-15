@@ -96,37 +96,37 @@ public class PangThirdPersonController : MonoBehaviour
 	private Transform ShootOrigin;
 
 	// player
-	private float _speed;
-	private float _animationBlend;
-	private float _targetRotation = 0.0f;
-	private float _rotationVelocity;
-	private float _verticalVelocity;
+	private float speed;
+	private float animationBlend;
+	private float targetRotation = 0.0f;
+	private float rotationVelocity;
+	private float verticalVelocity;
 
 	// animation IDs
-	private int _animIDSpeed;
-	private int _animIDGrounded;
-	private int _animIDFreeFall;
-	private int _animIDMotionSpeed;
-	private int _animIDClimb;
+	private int animIDSpeed;
+	private int animIDGrounded;
+	private int animIDFreeFall;
+	private int animIDMotionSpeed;
+	private int animIDClimb;
 
-	private Animator _animator;
+	private Animator animator;
 	private InputManager inputManager;
-	private GameObject _mainCamera;
+	private GameObject mainCamera;
 	private bool isSprinting;
 	private Vector3 velocity;
 
-	private bool _hasAnimator;
+	private bool hasAnimator;
 
 	private int maxHooksToShoot;
 	private int currentHooksShot;
 
 	private bool isInStairs;
 	private bool isGamePaused;
-	private float _climbSpeed;
+	private float climbSpeed;
 
 	private bool isShieldEnabled;
 	private HookType hookType;
-	private ShieldVisual _shieldVisual;
+	private ShieldVisual shieldVisual;
 	private bool isInvulnerable;
 
 	public int GetPlayerId() => PlayerId;
@@ -137,16 +137,16 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void Awake()
 	{
-		_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+		mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 
 		velocity = Vector3.zero;
 		maxHooksToShoot = 1;
 		currentHooksShot = 0;
 		isInStairs = false;
 		isGamePaused = false;
-		_climbSpeed = 0.0f;
+		climbSpeed = 0.0f;
 		isShieldEnabled = false;
-		_shieldVisual = GetComponentInChildren<ShieldVisual>();
+		shieldVisual = GetComponentInChildren<ShieldVisual>();
 	}
 
 	public void StartInvulnerability()
@@ -168,18 +168,18 @@ public class PangThirdPersonController : MonoBehaviour
 	public void ActivateShield()
 	{
 		isShieldEnabled = true;
-		if (_shieldVisual != null)
+		if (shieldVisual != null)
 		{
-			_shieldVisual.Activate();
+			shieldVisual.Activate();
 		}
 	}
 
 	public void DeactivateShield()
 	{
 		isShieldEnabled = false;
-		if (_shieldVisual != null)
+		if (shieldVisual != null)
 		{
-			_shieldVisual.Deactivate();
+			shieldVisual.Deactivate();
 		}
 	}
 
@@ -192,9 +192,9 @@ public class PangThirdPersonController : MonoBehaviour
 	{
 		isInStairs = true;
 
-		if (_hasAnimator)
+		if (hasAnimator)
 		{
-			_animator.SetBool(_animIDClimb, true);
+			animator.SetBool(animIDClimb, true);
 		}
 
 	}
@@ -202,15 +202,15 @@ public class PangThirdPersonController : MonoBehaviour
 	public void DeactivateStairs()
 	{
 		isInStairs = false;
-		if (_hasAnimator)
+		if (hasAnimator)
 		{
-			_animator.SetBool(_animIDClimb, false);
+			animator.SetBool(animIDClimb, false);
 		}
 	}
 
 	private void Start()
 	{
-		_hasAnimator = TryGetComponent(out _animator);
+		hasAnimator = TryGetComponent(out animator);
 		inputManager = FindAnyObjectByType<InputManager>();
 
 		isSprinting = false;
@@ -285,7 +285,6 @@ public class PangThirdPersonController : MonoBehaviour
 		{
 			OnHookLaunched?.Invoke(this, this);
 			currentHooksShot++;
-			Debug.Log("hook");
 			var hook = Instantiate(HookPrefab).GetComponent<PangHook>();
 			hook.Shoot(HookOrigin, hookType, OnHookDestroyed, PlayerId);
 
@@ -346,11 +345,11 @@ public class PangThirdPersonController : MonoBehaviour
 
 	private void AssignAnimationIDs()
 	{
-		_animIDSpeed = Animator.StringToHash("Speed");
-		_animIDGrounded = Animator.StringToHash("Grounded");
-		_animIDFreeFall = Animator.StringToHash("FreeFall");
-		_animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-		_animIDClimb = Animator.StringToHash("Climb");
+		animIDSpeed = Animator.StringToHash("Speed");
+		animIDGrounded = Animator.StringToHash("Grounded");
+		animIDFreeFall = Animator.StringToHash("FreeFall");
+		animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+		animIDClimb = Animator.StringToHash("Climb");
 	}
 
 	private void GroundedCheck()
@@ -362,9 +361,9 @@ public class PangThirdPersonController : MonoBehaviour
 			QueryTriggerInteraction.Ignore) || isInStairs;
 
 		// update animator if using character
-		if (_hasAnimator)
+		if (hasAnimator)
 		{
-			_animator.SetBool(_animIDGrounded, Grounded);
+			animator.SetBool(animIDGrounded, Grounded);
 		}
 	}
 
@@ -416,31 +415,31 @@ public class PangThirdPersonController : MonoBehaviour
 		}
 
 		float inputMagnitude = 1f;
-		_speed = UpdateSpeed(targetSpeed, inputMagnitude);
+		speed = UpdateSpeed(targetSpeed, inputMagnitude);
 		var targetClimbSpeed = isInStairs ? ClimbSpeed * inputY : 0f;
-		_climbSpeed = UpdateClimbSpeed(targetClimbSpeed, inputMagnitude);
+		climbSpeed = UpdateClimbSpeed(targetClimbSpeed, inputMagnitude);
 
-		_animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-		if (_animationBlend < 0.01f)
+		animationBlend = Mathf.Lerp(animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
+		if (animationBlend < 0.01f)
 		{
-			_animationBlend = 0f;
+			animationBlend = 0f;
 		}
 
 		// if there is a move input rotate player when the player is moving
 		if (inputX != 0)
 		{
-			_targetRotation = Mathf.Atan2(inputX, 0) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
-			float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+			targetRotation = Mathf.Atan2(inputX, 0) * Mathf.Rad2Deg + mainCamera.transform.eulerAngles.y;
+			float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref rotationVelocity,
 				RotationSmoothTime);
 
 			// rotate to face input direction relative to camera position
 			transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 		}
 
-		var targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+		var targetDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
 
 		// move the player
-		velocity = targetDirection.normalized * _speed + new Vector3(0.0f, _verticalVelocity + _climbSpeed, 0.0f);
+		velocity = targetDirection.normalized * speed + new Vector3(0.0f, verticalVelocity + climbSpeed, 0.0f);
 
 		transform.SetPositionAndRotation(transform.position + velocity * Time.deltaTime,
 			new Quaternion(0, transform.rotation.y, 0, transform.rotation.w));
@@ -451,34 +450,34 @@ public class PangThirdPersonController : MonoBehaviour
 		}
 
 		// update animator if using character
-		if (_hasAnimator)
+		if (hasAnimator)
 		{
-			_animator.SetFloat(_animIDSpeed, _animationBlend);
-			_animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+			animator.SetFloat(animIDSpeed, animationBlend);
+			animator.SetFloat(animIDMotionSpeed, inputMagnitude);
 		}
 	}
 
 	private void JumpAndGravity()
 	{
 		// update animator if using character
-		if (_hasAnimator)
+		if (hasAnimator)
 		{
-			_animator.SetBool(_animIDFreeFall, !Grounded);
+			animator.SetBool(animIDFreeFall, !Grounded);
 		}
 
 		if (Grounded || isInStairs)
 		{
-			_verticalVelocity = 0;
+			verticalVelocity = 0;
 		}
 		else
 		{
 			// stop our velocity dropping infinitely when grounded
-			if (_verticalVelocity < 0.0f)
+			if (verticalVelocity < 0.0f)
 			{
-				_verticalVelocity = -2f;
+				verticalVelocity = -2f;
 			}
 
-			_verticalVelocity += Gravity * Time.deltaTime;
+			verticalVelocity += Gravity * Time.deltaTime;
 		}
 	}
 

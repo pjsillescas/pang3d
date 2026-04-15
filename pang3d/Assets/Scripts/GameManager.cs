@@ -206,7 +206,6 @@ public class GameManager : MonoBehaviour
 	
 	public PangThirdPersonController SpawnPlayer1()
 	{
-		//var controller = playerChoices.TrySpawnPlayer1();
 		var controller = GetPlayerHandler1().TrySpawnPlayer();
 		if (controller != null)
 		{
@@ -218,7 +217,6 @@ public class GameManager : MonoBehaviour
 
 	public PangThirdPersonController SpawnPlayer2()
 	{
-		//var controller = playerChoices.TrySpawnPlayer2();
 		var controller = GetPlayerHandler2().TrySpawnPlayer();
 		if (controller != null)
 		{
