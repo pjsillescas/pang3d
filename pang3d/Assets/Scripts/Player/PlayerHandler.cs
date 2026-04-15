@@ -22,6 +22,8 @@ public class PlayerHandler
 		if (controller != null)
 		{
 			controller.transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
+			controller.StartInvulnerability();
+
 		}
 		else
 		{

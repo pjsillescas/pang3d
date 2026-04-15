@@ -5,7 +5,7 @@ using static PangHook;
 
 public class PangThirdPersonController : MonoBehaviour
 {
-	private const float INVULNERABILITY_TIME_SECONDS = 5f;
+	private const float INVULNERABILITY_TIME_SECONDS = 10f;
 
 	public struct ScoreStruct
 	{
@@ -147,7 +147,11 @@ public class PangThirdPersonController : MonoBehaviour
 		_climbSpeed = 0.0f;
 		isShieldEnabled = false;
 		_shieldVisual = GetComponentInChildren<ShieldVisual>();
-		isInvulnerable = true;
+	}
+
+	public void StartInvulnerability()
+	{
+		StartCoroutine(DisableInvulnerabilityCoroutine());
 	}
 
 	public void SetHookType(HookType hookType)
@@ -221,12 +225,13 @@ public class PangThirdPersonController : MonoBehaviour
 
 		hookType = HookType.HOOK;
 		OnHookChanged?.Invoke(this, new() { hookType = hookType, playerId = PlayerId });
-
-		StartCoroutine(DisableInvulnerabilityCoroutine());
+		StartInvulnerability();
 	}
 
 	private IEnumerator DisableInvulnerabilityCoroutine()
 	{
+		isInvulnerable = true;
+
 		yield return new WaitForSeconds(INVULNERABILITY_TIME_SECONDS);
 
 		isInvulnerable = false;
